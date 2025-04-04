@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Lista de Logins</title>
+  <style>
+    body {
+      background: #111;
+      color: white;
+      font-family: monospace;
+      padding: 30px;
+      text-align: center;
+    }
+
+    h1 {
+      color: #674DE9;
+      margin-bottom: 30px;
+    }
+
+    .lista {
+      background: #1a1a1a;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px #000;
+      display: inline-block;
+      text-align: left;
+      max-width: 90%;
+    }
+
+    .linha {
+      padding: 6px 0;
+      border-bottom: 1px solid #333;
+      white-space: pre;
+    }
+  </style>
+</head>
+<body>
+  <h1>Logins Salvos</h1>
+
+  <div class="lista" id="lista"></div>
+
+  <script>
+    const id = "1Jq4zCKRKYKEjDAxMTmvE3kKta_rQkxPiU-fW-3Z9_aY";
+    const url = `https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:json&sheet=Sheet1`;
+
+    fetch(url)
+      .then(res => res.text())
+      .then(txt => {
+        const dados = JSON.parse(txt.substring(47).slice(0, -2));
+        const linhas = dados.table.rows;
+        const divLista = document.getElementById("lista");
+
+        linhas.forEach(linha => {
+          const nick = linha.c[0]?.v || "";
+          const senha = linha.c[1]?.v || "";
+          const formatado = nick.padEnd(22, ' ') + senha;
+          divLista.innerHTML += `<div class="linha">${formatado}</div>`;
+        });
+      });
+  </script>
+</body>
+</html>
