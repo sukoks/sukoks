@@ -1,62 +1,918 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <title>Lista de Logins</title>
-  <style>
-    body {
-      background: #111;
-      color: white;
-      font-family: monospace;
-      padding: 30px;
-      text-align: center;
-    }
-
-    h1 {
-      color: #674DE9;
-      margin-bottom: 30px;
-    }
-
-    .lista {
-      background: #1a1a1a;
-      padding: 20px;
-      border-radius: 10px;
-      box-shadow: 0 0 10px #000;
-      display: inline-block;
-      text-align: left;
-      max-width: 90%;
-    }
-
-    .linha {
-      padding: 6px 0;
-      border-bottom: 1px solid #333;
-      white-space: pre;
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestão de Diárias</title>
+    <style>
+        :root {
+            --primary: #4CAF50;
+            --primary-light: #81C784;
+            --primary-dark: #388E3C;
+            --secondary: #2196F3;
+            --text: #333;
+            --light: #f5f5f5;
+            --white: #fff;
+            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            --transition: all 0.3s ease;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: var(--light);
+            color: var(--text);
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        h1 {
+            color: var(--primary-dark);
+        }
+        
+        .btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            font-weight: bold;
+            transition: var(--transition);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .btn-primary {
+            background-color: var(--primary);
+            color: var(--white);
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--primary-dark);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+        
+        .btn-secondary {
+            background-color: var(--secondary);
+            color: var(--white);
+        }
+        
+        .btn-secondary:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+        
+        .btn-outline {
+            background-color: transparent;
+            border: 1px solid var(--primary);
+            color: var(--primary);
+        }
+        
+        .btn-outline:hover {
+            background-color: var(--primary);
+            color: var(--white);
+        }
+        
+        .card {
+            background-color: var(--white);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: var(--shadow);
+            margin-bottom: 20px;
+            transition: var(--transition);
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .form-group {
+            margin-bottom: 15px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        
+        .workers-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 20px;
+        }
+        
+        .worker-card {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border-radius: 10px;
+            background-color: var(--white);
+            box-shadow: var(--shadow);
+            transition: var(--transition);
+            cursor: pointer;
+        }
+        
+        .worker-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+        
+        .worker-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-right: 15px;
+            border: 3px solid var(--primary-light);
+        }
+        
+        .worker-info {
+            flex: 1;
+        }
+        
+        .worker-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .worker-role {
+            color: var(--primary-dark);
+            font-size: 14px;
+            padding: 3px 8px;
+            background-color: var(--primary-light);
+            border-radius: 20px;
+            display: inline-block;
+            margin-bottom: 5px;
+        }
+        
+        .worker-location {
+            font-size: 13px;
+            color: #666;
+            display: flex;
+            align-items: center;
+        }
+        
+        .worker-location svg {
+            margin-right: 5px;
+        }
+        
+        .action-buttons {
+            display: flex;
+            justify-content: flex-end;
+            margin-top: 20px;
+            gap: 10px;
+        }
+        
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .modal-content {
+            background-color: var(--white);
+            padding: 30px;
+            border-radius: 10px;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .close-modal {
+            font-size: 24px;
+            cursor: pointer;
+            color: #999;
+        }
+        
+        .close-modal:hover {
+            color: var(--text);
+        }
+        
+        .calendar {
+            width: 100%;
+            margin-top: 20px;
+        }
+        
+        .calendar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .calendar-title {
+            font-weight: bold;
+        }
+        
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 5px;
+        }
+        
+        .calendar-day-header {
+            text-align: center;
+            font-weight: bold;
+            padding: 5px;
+        }
+        
+        .calendar-day {
+            aspect-ratio: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+        }
+        
+        .calendar-day:hover {
+            background-color: var(--primary-light);
+        }
+        
+        .calendar-day.selected {
+            background-color: var(--primary);
+            color: var(--white);
+            opacity: 0.6;
+        }
+        
+        .calendar-day.disabled {
+            color: #ccc;
+            pointer-events: none;
+        }
+        
+        .summary {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: var(--light);
+            border-radius: 10px;
+        }
+        
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+        }
+        
+        .settings-card {
+            margin-top: 30px;
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .location-icon {
+            width: 16px;
+            height: 16px;
+            margin-right: 5px;
+            fill: currentColor;
+        }
+        
+        @media (max-width: 768px) {
+            .workers-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
 </head>
 <body>
-  <h1>Logins Salvos</h1>
+    <div class="container">
+        <!-- Tela Principal -->
+        <div id="main-screen">
+            <header>
+                <h1>Gestão de Diárias</h1>
+                <button id="settings-btn" class="btn btn-outline">Configurações</button>
+            </header>
+            
+            <div class="card fade-in">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h2>Funcionários</h2>
+                    <button id="add-worker-btn" class="btn btn-primary">+ Adicionar</button>
+                </div>
+                
+                <div id="workers-container" class="workers-grid">
+                    <!-- Workers will be added here dynamically -->
+                </div>
+            </div>
+        </div>
+        
+        <!-- Modal Adicionar Funcionário -->
+        <div id="add-worker-modal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Adicionar Funcionário</h2>
+                    <span class="close-modal">&times;</span>
+                </div>
+                
+                <div class="form-group">
+                    <label for="worker-name">NOME</label>
+                    <input type="text" id="worker-name" placeholder="Nome do funcionário">
+                </div>
+                
+                <div class="form-group">
+                    <label for="worker-role">CARGO</label>
+                    <select id="worker-role">
+                        <option value="">Selecione um cargo</option>
+                        <option value="pedreiro">Pedreiro</option>
+                        <option value="ajudante">Ajudante</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label for="worker-location">LOCAL DE TRABALHO (Opcional)</label>
+                    <input type="text" id="worker-location" placeholder="Ex: Obra do Centro, Casa da Praia">
+                </div>
+                
+                <div class="action-buttons">
+                    <button id="cancel-add-worker" class="btn btn-outline">Cancelar</button>
+                    <button id="save-worker" class="btn btn-primary">Salvar</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Tela de Detalhes do Funcionário -->
+        <div id="detail-screen" style="display: none;">
+            <header>
+                <button id="back-to-main" class="btn btn-outline">← Voltar</button>
+                <h1 id="detail-title">Detalhes do Funcionário</h1>
+            </header>
+            
+            <div class="card fade-in">
+                <div style="display: flex; align-items: center; margin-bottom: 20px;">
+                    <img id="detail-avatar" src="" alt="Avatar" class="worker-avatar">
+                    <div>
+                        <div id="detail-worker-name" class="worker-name"></div>
+                        <div id="detail-worker-role" class="worker-role"></div>
+                        <div id="detail-worker-location" class="worker-location">
+                            <svg class="location-icon" viewBox="0 0 24 24">
+                                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                            </svg>
+                            <span id="location-text">Sem local definido</span>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="calendar">
+                    <div class="calendar-header">
+                        <div class="calendar-title" id="current-month">Maio 2025</div>
+                        <div>
+                            <button id="prev-month" class="btn btn-outline" style="padding: 5px 10px;">&lt;</button>
+                            <button id="next-month" class="btn btn-outline" style="padding: 5px 10px;">&gt;</button>
+                        </div>
+                    </div>
+                    
+                    <div class="calendar-grid" id="calendar-days-header">
+                        <div class="calendar-day-header">Dom</div>
+                        <div class="calendar-day-header">Seg</div>
+                        <div class="calendar-day-header">Ter</div>
+                        <div class="calendar-day-header">Qua</div>
+                        <div class="calendar-day-header">Qui</div>
+                        <div class="calendar-day-header">Sex</div>
+                        <div class="calendar-day-header">Sáb</div>
+                    </div>
+                    
+                    <div class="calendar-grid" id="calendar-days">
+                        <!-- Calendar days will be generated here -->
+                    </div>
+                </div>
+                
+                <div class="summary">
+                    <div class="summary-item">
+                        <span>Dias trabalhados:</span>
+                        <span id="days-worked">0</span>
+                    </div>
+                    <div class="summary-item">
+                        <span>Valor da diária:</span>
+                        <span id="daily-value">R$ 0,00</span>
+                    </div>
+                    <div class="summary-item" style="font-weight: bold;">
+                        <span>Valor total:</span>
+                        <span id="total-value">R$ 0,00</span>
+                    </div>
+                </div>
+                
+                <div class="action-buttons">
+                    <button id="edit-location" class="btn btn-outline">Editar Local</button>
+                    <button id="generate-report" class="btn btn-primary">Gerar Dados</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Modal Configurações -->
+        <div id="settings-modal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Configurações</h2>
+                    <span class="close-modal">&times;</span>
+                </div>
+                
+                <div class="card settings-card">
+                    <h3 style="margin-bottom: 15px;">Valor das Diárias</h3>
+                    
+                    <div class="form-group">
+                        <label for="pedreiro-value">Diária do Pedreiro (R$)</label>
+                        <input type="number" id="pedreiro-value" placeholder="Valor da diária do pedreiro" step="0.01">
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="ajudante-value">Diária do Ajudante (R$)</label>
+                        <input type="number" id="ajudante-value" placeholder="Valor da diária do ajudante" step="0.01">
+                    </div>
+                </div>
+                
+                <div class="action-buttons">
+                    <button id="cancel-settings" class="btn btn-outline">Cancelar</button>
+                    <button id="save-settings" class="btn btn-primary">Salvar</button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Modal Editar Local -->
+        <div id="edit-location-modal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Editar Local de Trabalho</h2>
+                    <span class="close-modal">&times;</span>
+                </div>
+                
+                <div class="form-group">
+                    <label for="new-location">LOCAL DE TRABALHO</label>
+                    <input type="text" id="new-location" placeholder="Digite o novo local de trabalho">
+                </div>
+                
+                <div class="action-buttons">
+                    <button id="cancel-edit-location" class="btn btn-outline">Cancelar</button>
+                    <button id="save-location" class="btn btn-primary">Salvar</button>
+                </div>
+            </div>
+        </div>
+    </div>
 
-  <div class="lista" id="lista"></div>
-
-  <script>
-    const id = "1Jq4zCKRKYKEjDAxMTmvE3kKta_rQkxPiU-fW-3Z9_aY";
-    const url = `https://docs.google.com/spreadsheets/d/${id}/gviz/tq?tqx=out:json&sheet=Sheet1`;
-
-    fetch(url)
-      .then(res => res.text())
-      .then(txt => {
-        const dados = JSON.parse(txt.substring(47).slice(0, -2));
-        const linhas = dados.table.rows;
-        const divLista = document.getElementById("lista");
-
-        linhas.forEach(linha => {
-          const nick = linha.c[0]?.v || "";
-          const senha = linha.c[1]?.v || "";
-          const formatado = nick.padEnd(22, ' ') + senha;
-          divLista.innerHTML += `<div class="linha">${formatado}</div>`;
+    <script>
+        // Dados da aplicação
+        const workers = JSON.parse(localStorage.getItem('workers')) || [];
+        const settings = JSON.parse(localStorage.getItem('settings')) || {
+            pedreiroValue: 150.00,
+            ajudanteValue: 100.00
+        };
+        
+        // Elementos da tela principal
+        const mainScreen = document.getElementById('main-screen');
+        const workersContainer = document.getElementById('workers-container');
+        const addWorkerBtn = document.getElementById('add-worker-btn');
+        const settingsBtn = document.getElementById('settings-btn');
+        
+        // Elementos do modal de adicionar funcionário
+        const addWorkerModal = document.getElementById('add-worker-modal');
+        const workerNameInput = document.getElementById('worker-name');
+        const workerRoleSelect = document.getElementById('worker-role');
+        const workerLocationInput = document.getElementById('worker-location');
+        const saveWorkerBtn = document.getElementById('save-worker');
+        const cancelAddWorkerBtn = document.getElementById('cancel-add-worker');
+        const closeModalBtns = document.querySelectorAll('.close-modal');
+        
+        // Elementos da tela de detalhes
+        const detailScreen = document.getElementById('detail-screen');
+        const backToMainBtn = document.getElementById('back-to-main');
+        const detailTitle = document.getElementById('detail-title');
+        const detailAvatar = document.getElementById('detail-avatar');
+        const detailWorkerName = document.getElementById('detail-worker-name');
+        const detailWorkerRole = document.getElementById('detail-worker-role');
+        const locationText = document.getElementById('location-text');
+        const currentMonthEl = document.getElementById('current-month');
+        const prevMonthBtn = document.getElementById('prev-month');
+        const nextMonthBtn = document.getElementById('next-month');
+        const calendarDays = document.getElementById('calendar-days');
+        const daysWorkedEl = document.getElementById('days-worked');
+        const dailyValueEl = document.getElementById('daily-value');
+        const totalValueEl = document.getElementById('total-value');
+        const generateReportBtn = document.getElementById('generate-report');
+        const editLocationBtn = document.getElementById('edit-location');
+        
+        // Elementos do modal de configurações
+        const settingsModal = document.getElementById('settings-modal');
+        const pedreiroValueInput = document.getElementById('pedreiro-value');
+        const ajudanteValueInput = document.getElementById('ajudante-value');
+        const saveSettingsBtn = document.getElementById('save-settings');
+        const cancelSettingsBtn = document.getElementById('cancel-settings');
+        
+        // Elementos do modal de editar local
+        const editLocationModal = document.getElementById('edit-location-modal');
+        const newLocationInput = document.getElementById('new-location');
+        const saveLocationBtn = document.getElementById('save-location');
+        const cancelEditLocationBtn = document.getElementById('cancel-edit-location');
+        
+        // Variáveis de estado
+        let currentWorkerId = null;
+        let currentDate = new Date();
+        let currentYear = currentDate.getFullYear();
+        let currentMonth = currentDate.getMonth();
+        
+        // URLs das imagens
+        const pedreiroImage = 'https://media.istockphoto.com/id/1217836258/pt/vetorial/bricklayer.webp?s=612x612&w=is&k=20&c=MeULEje41HJwFvMxMzdyv3xtyvp4LoLH6YJ6ostBPwU=';
+        const ajudanteImage = 'https://img.freepik.com/vetores-premium/um-homem-empurra-um-carrinho-de-mao-com-um-saco-de-areia_820658-3.jpg?w=1060';
+        
+        // Inicialização
+        document.addEventListener('DOMContentLoaded', () => {
+            renderWorkers();
+            loadSettings();
+            
+            // Carregar valores padrão se não existirem configurações salvas
+            if (!localStorage.getItem('settings')) {
+                saveSettings();
+            }
         });
-      });
-  </script>
+        
+        // Event Listeners
+        addWorkerBtn.addEventListener('click', () => {
+            workerNameInput.value = '';
+            workerRoleSelect.value = '';
+            workerLocationInput.value = '';
+            addWorkerModal.style.display = 'flex';
+        });
+        
+        settingsBtn.addEventListener('click', () => {
+            pedreiroValueInput.value = settings.pedreiroValue;
+            ajudanteValueInput.value = settings.ajudanteValue;
+            settingsModal.style.display = 'flex';
+        });
+        
+        saveWorkerBtn.addEventListener('click', saveWorker);
+        cancelAddWorkerBtn.addEventListener('click', () => {
+            addWorkerModal.style.display = 'none';
+        });
+        
+        backToMainBtn.addEventListener('click', () => {
+            detailScreen.style.display = 'none';
+            mainScreen.style.display = 'block';
+            renderWorkers();
+        });
+        
+        prevMonthBtn.addEventListener('click', () => {
+            currentMonth--;
+            if (currentMonth < 0) {
+                currentMonth = 11;
+                currentYear--;
+            }
+            renderCalendar();
+        });
+        
+        nextMonthBtn.addEventListener('click', () => {
+            currentMonth++;
+            if (currentMonth > 11) {
+                currentMonth = 0;
+                currentYear++;
+            }
+            renderCalendar();
+        });
+        
+        generateReportBtn.addEventListener('click', generateReport);
+        
+        saveSettingsBtn.addEventListener('click', saveSettings);
+        cancelSettingsBtn.addEventListener('click', () => {
+            settingsModal.style.display = 'none';
+        });
+        
+        editLocationBtn.addEventListener('click', () => {
+            const worker = workers.find(w => w.id === currentWorkerId);
+            if (worker) {
+                newLocationInput.value = worker.location || '';
+                editLocationModal.style.display = 'flex';
+            }
+        });
+        
+        saveLocationBtn.addEventListener('click', () => {
+            const worker = workers.find(w => w.id === currentWorkerId);
+            if (worker) {
+                worker.location = newLocationInput.value.trim();
+                saveWorkers();
+                updateWorkerDetails(worker);
+                editLocationModal.style.display = 'none';
+            }
+        });
+        
+        cancelEditLocationBtn.addEventListener('click', () => {
+            editLocationModal.style.display = 'none';
+        });
+        
+        closeModalBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                addWorkerModal.style.display = 'none';
+                settingsModal.style.display = 'none';
+                editLocationModal.style.display = 'none';
+            });
+        });
+        
+        // Fechar modal ao clicar fora
+        window.addEventListener('click', (e) => {
+            if (e.target === addWorkerModal) {
+                addWorkerModal.style.display = 'none';
+            }
+            if (e.target === settingsModal) {
+                settingsModal.style.display = 'none';
+            }
+            if (e.target === editLocationModal) {
+                editLocationModal.style.display = 'none';
+            }
+        });
+        
+        // Funções
+        function renderWorkers() {
+            workersContainer.innerHTML = '';
+            
+            if (workers.length === 0) {
+                workersContainer.innerHTML = '<p>Nenhum funcionário cadastrado. Clique em "Adicionar" para começar.</p>';
+                return;
+            }
+            
+            workers.forEach(worker => {
+                const workerCard = document.createElement('div');
+                workerCard.className = 'worker-card';
+                workerCard.dataset.id = worker.id;
+                
+                workerCard.innerHTML = `
+                    <img src="${worker.role === 'pedreiro' ? pedreiroImage : ajudanteImage}" alt="${worker.role}" class="worker-avatar">
+                    <div class="worker-info">
+                        <div class="worker-name">${worker.name}</div>
+                        <div class="worker-role">${worker.role === 'pedreiro' ? 'Pedreiro' : 'Ajudante'}</div>
+                        ${worker.location ? `
+                            <div class="worker-location">
+                                <svg class="location-icon" viewBox="0 0 24 24">
+                                    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
+                                </svg>
+                                ${worker.location}
+                            </div>
+                        ` : ''}
+                    </div>
+                `;
+                
+                workerCard.addEventListener('click', () => showWorkerDetail(worker.id));
+                workersContainer.appendChild(workerCard);
+            });
+        }
+        
+        function saveWorker() {
+            const name = workerNameInput.value.trim();
+            const role = workerRoleSelect.value;
+            const location = workerLocationInput.value.trim();
+            
+            if (!name || !role) {
+                alert('Por favor, preencha todos os campos obrigatórios');
+                return;
+            }
+            
+            const newWorker = {
+                id: Date.now().toString(),
+                name,
+                role,
+                location: location || null,
+                workedDays: []
+            };
+            
+            workers.push(newWorker);
+            saveWorkers();
+            addWorkerModal.style.display = 'none';
+            renderWorkers();
+        }
+        
+        function showWorkerDetail(id) {
+            const worker = workers.find(w => w.id === id);
+            if (!worker) return;
+            
+            currentWorkerId = id;
+            mainScreen.style.display = 'none';
+            detailScreen.style.display = 'block';
+            
+            updateWorkerDetails(worker);
+            
+            // Resetar para o mês atual
+            currentDate = new Date();
+            currentYear = currentDate.getFullYear();
+            currentMonth = currentDate.getMonth();
+            
+            renderCalendar();
+            updateSummary();
+        }
+        
+        function updateWorkerDetails(worker) {
+            detailTitle.textContent = `Detalhes: ${worker.name}`;
+            detailWorkerName.textContent = worker.name;
+            detailWorkerRole.textContent = worker.role === 'pedreiro' ? 'Pedreiro' : 'Ajudante';
+            detailAvatar.src = worker.role === 'pedreiro' ? pedreiroImage : ajudanteImage;
+            locationText.textContent = worker.location || 'Sem local definido';
+        }
+        
+        function renderCalendar() {
+            const firstDay = new Date(currentYear, currentMonth, 1);
+            const lastDay = new Date(currentYear, currentMonth + 1, 0);
+            const daysInMonth = lastDay.getDate();
+            const startingDay = firstDay.getDay();
+            
+            currentMonthEl.textContent = `${getMonthName(currentMonth)} ${currentYear}`;
+            calendarDays.innerHTML = '';
+            
+            // Dias vazios no início
+            for (let i = 0; i < startingDay; i++) {
+                const emptyDay = document.createElement('div');
+                emptyDay.className = 'calendar-day disabled';
+                calendarDays.appendChild(emptyDay);
+            }
+            
+            // Dias do mês
+            const worker = workers.find(w => w.id === currentWorkerId);
+            
+            for (let day = 1; day <= daysInMonth; day++) {
+                const date = new Date(currentYear, currentMonth, day);
+                const dayElement = document.createElement('div');
+                dayElement.className = 'calendar-day';
+                dayElement.textContent = day;
+                dayElement.dataset.date = date.toISOString().split('T')[0];
+                
+                // Verificar se o dia está marcado como trabalhado
+                if (worker && worker.workedDays.includes(date.toISOString().split('T')[0])) {
+                    dayElement.classList.add('selected');
+                }
+                
+                dayElement.addEventListener('click', () => toggleWorkDay(date, dayElement));
+                calendarDays.appendChild(dayElement);
+            }
+        }
+        
+        function toggleWorkDay(date, element) {
+            const dateStr = date.toISOString().split('T')[0];
+            const worker = workers.find(w => w.id === currentWorkerId);
+            
+            if (!worker) return;
+            
+            // Sistema de contagem de cliques rápidos
+            if (!element.dataset.clickCount) {
+                element.dataset.clickCount = '0';
+                element.dataset.clickTimer = '0';
+            }
+            
+            // Incrementar contador
+            element.dataset.clickCount = parseInt(element.dataset.clickCount) + 1;
+            
+            // Se for o primeiro clique, iniciar temporizador
+            if (parseInt(element.dataset.clickCount) === 1) {
+                element.dataset.clickTimer = setTimeout(() => {
+                    element.dataset.clickCount = '0'; // Reset após 1 segundo
+                }, 1000);
+            }
+            
+            // Se atingir 3 cliques em menos de 1 segundo
+            if (parseInt(element.dataset.clickCount) >= 3) {
+                clearTimeout(element.dataset.clickTimer);
+                element.dataset.clickCount = '0';
+                
+                // Remover o dia se estiver selecionado
+                const index = worker.workedDays.indexOf(dateStr);
+                if (index !== -1) {
+                    worker.workedDays.splice(index, 1);
+                    element.classList.remove('selected');
+                    saveWorkers();
+                    updateSummary();
+                }
+                return;
+            }
+            
+            // Comportamento normal para 1-2 cliques
+            const index = worker.workedDays.indexOf(dateStr);
+            
+            if (index === -1) {
+                worker.workedDays.push(dateStr);
+                element.classList.add('selected');
+            } else {
+                worker.workedDays.splice(index, 1);
+                element.classList.remove('selected');
+            }
+            
+            saveWorkers();
+            updateSummary();
+        }
+        
+        function updateSummary() {
+            const worker = workers.find(w => w.id === currentWorkerId);
+            if (!worker) return;
+            
+            const daysWorked = worker.workedDays.length;
+            const dailyValue = worker.role === 'pedreiro' ? settings.pedreiroValue : settings.ajudanteValue;
+            const totalValue = daysWorked * dailyValue;
+            
+            daysWorkedEl.textContent = daysWorked;
+            dailyValueEl.textContent = `R$ ${dailyValue.toFixed(2)}`.replace('.', ',');
+            totalValueEl.textContent = `R$ ${totalValue.toFixed(2)}`.replace('.', ',');
+        }
+        
+        function generateReport() {
+            const worker = workers.find(w => w.id === currentWorkerId);
+            if (!worker) return;
+            
+            const dailyValue = worker.role === 'pedreiro' ? settings.pedreiroValue : settings.ajudanteValue;
+            const totalValue = worker.workedDays.length * dailyValue;
+            
+            const report = {
+                nome: worker.name,
+                cargo: worker.role === 'pedreiro' ? 'Pedreiro' : 'Ajudante',
+                local: worker.location || 'Não informado',
+                quantidadeDiasTrabalhados: worker.workedDays.length,
+                valorDiaria: dailyValue,
+                valorTotal: totalValue,
+                diasTrabalhados: worker.workedDays.sort()
+            };
+            
+            // Criar e fazer download do arquivo JSON
+            const dataStr = JSON.stringify(report, null, 2);
+            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+            
+            const exportFileDefaultName = `relatorio_${worker.name}_${getMonthName(currentMonth)}_${currentYear}.json`;
+            
+            const linkElement = document.createElement('a');
+            linkElement.setAttribute('href', dataUri);
+            linkElement.setAttribute('download', exportFileDefaultName);
+            linkElement.click();
+        }
+        
+        function saveWorkers() {
+            localStorage.setItem('workers', JSON.stringify(workers));
+        }
+        
+        function loadSettings() {
+            pedreiroValueInput.value = settings.pedreiroValue;
+            ajudanteValueInput.value = settings.ajudanteValue;
+        }
+        
+        function saveSettings() {
+            settings.pedreiroValue = parseFloat(pedreiroValueInput.value) || 150.00;
+            settings.ajudanteValue = parseFloat(ajudanteValueInput.value) || 100.00;
+            localStorage.setItem('settings', JSON.stringify(settings));
+            settingsModal.style.display = 'none';
+            
+            // Atualizar resumo se estiver na tela de detalhes
+            if (currentWorkerId) {
+                updateSummary();
+            }
+        }
+        
+        function getMonthName(monthIndex) {
+            const months = [
+                'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
+                'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
+            ];
+            return months[monthIndex];
+        }
+    </script>
 </body>
-</html>
+  </html>
