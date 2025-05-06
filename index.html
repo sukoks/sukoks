@@ -10,6 +10,8 @@
             --primary-light: #81C784;
             --primary-dark: #388E3C;
             --secondary: #2196F3;
+            --danger: #f44336;
+            --danger-dark: #d32f2f;
             --text: #333;
             --light: #f5f5f5;
             --white: #fff;
@@ -82,6 +84,20 @@
             box-shadow: var(--shadow);
         }
         
+        .btn-danger {
+            background-color: var(--danger);
+            color: var(--white);
+            border-radius: 5px;
+            padding: 8px 15px;
+            font-size: 14px;
+        }
+        
+        .btn-danger:hover {
+            background-color: var(--danger-dark);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow);
+        }
+        
         .btn-outline {
             background-color: transparent;
             border: 1px solid var(--primary);
@@ -140,6 +156,7 @@
             box-shadow: var(--shadow);
             transition: var(--transition);
             cursor: pointer;
+            position: relative;
         }
         
         .worker-card:hover {
@@ -184,6 +201,24 @@
         
         .worker-location svg {
             margin-right: 5px;
+        }
+        
+        .worker-delete {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            background-color: var(--danger);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 3px 8px;
+            cursor: pointer;
+            font-size: 12px;
+            transition: var(--transition);
+        }
+        
+        .worker-delete:hover {
+            background-color: var(--danger-dark);
         }
         
         .action-buttons {
@@ -308,16 +343,16 @@
             animation: fadeIn 0.5s ease-in;
         }
         
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        
         .location-icon {
             width: 16px;
             height: 16px;
             margin-right: 5px;
             fill: currentColor;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         
         @media (max-width: 768px) {
@@ -444,6 +479,7 @@
                 </div>
                 
                 <div class="action-buttons">
+                    <button id="clear-days" class="btn btn-danger">Desmarcar Todos</button>
                     <button id="edit-location" class="btn btn-outline">Editar Local</button>
                     <button id="generate-report" class="btn btn-primary">Gerar Dados</button>
                 </div>
@@ -498,6 +534,23 @@
                 </div>
             </div>
         </div>
+        
+        <!-- Modal Confirmar Exclusão -->
+        <div id="confirm-delete-modal" class="modal">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h2>Confirmar Exclusão</h2>
+                    <span class="close-modal">&times;</span>
+                </div>
+                
+                <p>Tem certeza que deseja excluir este funcionário? Esta ação não pode ser desfeita.</p>
+                
+                <div class="action-buttons">
+                    <button id="cancel-delete" class="btn btn-outline">Cancelar</button>
+                    <button id="confirm-delete" class="btn btn-danger">Excluir</button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -540,6 +593,7 @@
         const totalValueEl = document.getElementById('total-value');
         const generateReportBtn = document.getElementById('generate-report');
         const editLocationBtn = document.getElementById('edit-location');
+        const clearDaysBtn = document.getElementById('clear-days');
         
         // Elementos do modal de configurações
         const settingsModal = document.getElementById('settings-modal');
@@ -554,8 +608,14 @@
         const saveLocationBtn = document.getElementById('save-location');
         const cancelEditLocationBtn = document.getElementById('cancel-edit-location');
         
+        // Elementos do modal de confirmar exclusão
+        const confirmDeleteModal = document.getElementById('confirm-delete-modal');
+        const confirmDeleteBtn = document.getElementById('confirm-delete');
+        const cancelDeleteBtn = document.getElementById('cancel-delete');
+        
         // Variáveis de estado
         let currentWorkerId = null;
+        let workerToDeleteId = null;
         let currentDate = new Date();
         let currentYear = currentDate.getFullYear();
         let currentMonth = currentDate.getMonth();
@@ -647,11 +707,40 @@
             editLocationModal.style.display = 'none';
         });
         
+        clearDaysBtn.addEventListener('click', () => {
+            const worker = workers.find(w => w.id === currentWorkerId);
+            if (worker) {
+                worker.workedDays = [];
+                saveWorkers();
+                renderCalendar();
+                updateSummary();
+            }
+        });
+        
+        confirmDeleteBtn.addEventListener('click', () => {
+            if (workerToDeleteId) {
+                const index = workers.findIndex(w => w.id === workerToDeleteId);
+                if (index !== -1) {
+                    workers.splice(index, 1);
+                    saveWorkers();
+                    renderWorkers();
+                }
+                workerToDeleteId = null;
+                confirmDeleteModal.style.display = 'none';
+            }
+        });
+        
+        cancelDeleteBtn.addEventListener('click', () => {
+            workerToDeleteId = null;
+            confirmDeleteModal.style.display = 'none';
+        });
+        
         closeModalBtns.forEach(btn => {
             btn.addEventListener('click', () => {
                 addWorkerModal.style.display = 'none';
                 settingsModal.style.display = 'none';
                 editLocationModal.style.display = 'none';
+                confirmDeleteModal.style.display = 'none';
             });
         });
         
@@ -665,6 +754,9 @@
             }
             if (e.target === editLocationModal) {
                 editLocationModal.style.display = 'none';
+            }
+            if (e.target === confirmDeleteModal) {
+                confirmDeleteModal.style.display = 'none';
             }
         });
         
@@ -696,9 +788,24 @@
                             </div>
                         ` : ''}
                     </div>
+                    <button class="worker-delete" data-id="${worker.id}">×</button>
                 `;
                 
-                workerCard.addEventListener('click', () => showWorkerDetail(worker.id));
+                workerCard.addEventListener('click', (e) => {
+                    // Evitar que o clique no botão de deletar abra os detalhes
+                    if (!e.target.classList.contains('worker-delete')) {
+                        showWorkerDetail(worker.id);
+                    }
+                });
+                
+                // Adicionar evento ao botão de deletar
+                const deleteBtn = workerCard.querySelector('.worker-delete');
+                deleteBtn.addEventListener('click', (e) => {
+                    e.stopPropagation();
+                    workerToDeleteId = worker.id;
+                    confirmDeleteModal.style.display = 'flex';
+                });
+                
                 workersContainer.appendChild(workerCard);
             });
         }
@@ -796,39 +903,6 @@
             
             if (!worker) return;
             
-            // Sistema de contagem de cliques rápidos
-            if (!element.dataset.clickCount) {
-                element.dataset.clickCount = '0';
-                element.dataset.clickTimer = '0';
-            }
-            
-            // Incrementar contador
-            element.dataset.clickCount = parseInt(element.dataset.clickCount) + 1;
-            
-            // Se for o primeiro clique, iniciar temporizador
-            if (parseInt(element.dataset.clickCount) === 1) {
-                element.dataset.clickTimer = setTimeout(() => {
-                    element.dataset.clickCount = '0'; // Reset após 1 segundo
-                }, 1000);
-            }
-            
-            // Se atingir 3 cliques em menos de 1 segundo
-            if (parseInt(element.dataset.clickCount) >= 3) {
-                clearTimeout(element.dataset.clickTimer);
-                element.dataset.clickCount = '0';
-                
-                // Remover o dia se estiver selecionado
-                const index = worker.workedDays.indexOf(dateStr);
-                if (index !== -1) {
-                    worker.workedDays.splice(index, 1);
-                    element.classList.remove('selected');
-                    saveWorkers();
-                    updateSummary();
-                }
-                return;
-            }
-            
-            // Comportamento normal para 1-2 cliques
             const index = worker.workedDays.indexOf(dateStr);
             
             if (index === -1) {
@@ -879,10 +953,29 @@
             
             const exportFileDefaultName = `relatorio_${worker.name}_${getMonthName(currentMonth)}_${currentYear}.json`;
             
+            // Criar link para download
             const linkElement = document.createElement('a');
             linkElement.setAttribute('href', dataUri);
             linkElement.setAttribute('download', exportFileDefaultName);
+            
+            // Primeiro faz o download
             linkElement.click();
+            
+            // Depois prepara para enviar pelo WhatsApp
+            const whatsappMessage = `*Relatório de ${worker.name}*\n\n` +
+                                   `*Cargo:* ${report.cargo}\n` +
+                                   `*Local:* ${report.local}\n` +
+                                   `*Dias trabalhados:* ${report.quantidadeDiasTrabalhados}\n` +
+                                   `*Valor diária:* R$ ${dailyValue.toFixed(2)}\n` +
+                                   `*Total a receber:* R$ ${totalValue.toFixed(2)}`;
+            
+            // Codificar a mensagem para URL
+            const encodedMessage = encodeURIComponent(whatsappMessage);
+            
+            // Abrir WhatsApp após um pequeno delay para garantir o download
+            setTimeout(() => {
+                window.open(`https://wa.me/?text=${encodedMessage}`, '_blank');
+            }, 500);
         }
         
         function saveWorkers() {
@@ -915,4 +1008,4 @@
         }
     </script>
 </body>
-  </html>
+</html>
