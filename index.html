@@ -3,231 +3,278 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestão de Diárias</title>
+    <title>@edutouca - Chat</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
+        
         :root {
-            --primary: #4CAF50;
-            --primary-light: #81C784;
-            --primary-dark: #388E3C;
-            --secondary: #2196F3;
-            --danger: #f44336;
-            --danger-dark: #d32f2f;
-            --text: #333;
-            --light: #f5f5f5;
-            --white: #fff;
-            --shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            --transition: all 0.3s ease;
+            --dark-primary: #0a192f;
+            --medium-primary: #172a45;
+            --light-primary: #64ffda;
+            --dark-secondary: #150a1f;
+            --medium-secondary: #2a1745;
+            --light-secondary: #da64ff;
+            --text-color: #ccd6f6;
+            --text-secondary: #8892b0;
         }
         
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-family: 'Poppins', sans-serif;
         }
         
         body {
-            background-color: var(--light);
-            color: var(--text);
-            padding: 20px;
-        }
-        
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
+            background-color: var(--dark-primary);
+            color: var(--text-color);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            overflow-x: hidden;
         }
         
         header {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 30px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid #ddd;
+            padding: 20px 40px;
+            animation: fadeIn 1s ease-in-out;
         }
         
-        h1 {
-            color: var(--primary-dark);
-        }
-        
-        .btn {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 50px;
-            cursor: pointer;
-            font-weight: bold;
-            transition: var(--transition);
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-        }
-        
-        .btn-primary {
-            background-color: var(--primary);
-            color: var(--white);
-        }
-        
-        .btn-primary:hover {
-            background-color: var(--primary-dark);
-            transform: translateY(-2px);
-            box-shadow: var(--shadow);
-        }
-        
-        .btn-secondary {
-            background-color: var(--secondary);
-            color: var(--white);
-        }
-        
-        .btn-secondary:hover {
-            opacity: 0.9;
-            transform: translateY(-2px);
-            box-shadow: var(--shadow);
-        }
-        
-        .btn-danger {
-            background-color: var(--danger);
-            color: var(--white);
-            border-radius: 5px;
-            padding: 8px 15px;
-            font-size: 14px;
-        }
-        
-        .btn-danger:hover {
-            background-color: var(--danger-dark);
-            transform: translateY(-2px);
-            box-shadow: var(--shadow);
-        }
-        
-        .btn-outline {
-            background-color: transparent;
-            border: 1px solid var(--primary);
-            color: var(--primary);
-        }
-        
-        .btn-outline:hover {
-            background-color: var(--primary);
-            color: var(--white);
-        }
-        
-        .card {
-            background-color: var(--white);
-            border-radius: 10px;
-            padding: 20px;
-            box-shadow: var(--shadow);
-            margin-bottom: 20px;
-            transition: var(--transition);
-        }
-        
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-        }
-        
-        .form-group {
-            margin-bottom: 15px;
-        }
-        
-        label {
-            display: block;
-            margin-bottom: 5px;
-            font-weight: bold;
-        }
-        
-        input, select {
-            width: 100%;
-            padding: 10px;
-            border: 1px solid #ddd;
-            border-radius: 5px;
-            font-size: 16px;
-        }
-        
-        .workers-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 20px;
-        }
-        
-        .worker-card {
+        .logo {
+            font-size: 24px;
+            font-weight: 600;
+            color: var(--light-primary);
             display: flex;
             align-items: center;
-            padding: 15px;
-            border-radius: 10px;
-            background-color: var(--white);
-            box-shadow: var(--shadow);
-            transition: var(--transition);
-            cursor: pointer;
-            position: relative;
-        }
-        
-        .worker-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
-        }
-        
-        .worker-avatar {
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            object-fit: cover;
-            margin-right: 15px;
-            border: 3px solid var(--primary-light);
-        }
-        
-        .worker-info {
-            flex: 1;
-        }
-        
-        .worker-name {
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-        
-        .worker-role {
-            color: var(--primary-dark);
-            font-size: 14px;
-            padding: 3px 8px;
-            background-color: var(--primary-light);
-            border-radius: 20px;
-            display: inline-block;
-            margin-bottom: 5px;
-        }
-        
-        .worker-location {
-            font-size: 13px;
-            color: #666;
-            display: flex;
-            align-items: center;
-        }
-        
-        .worker-location svg {
-            margin-right: 5px;
-        }
-        
-        .worker-delete {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            background-color: var(--danger);
-            color: white;
-            border: none;
-            border-radius: 5px;
-            padding: 3px 8px;
-            cursor: pointer;
-            font-size: 12px;
-            transition: var(--transition);
-        }
-        
-        .worker-delete:hover {
-            background-color: var(--danger-dark);
-        }
-        
-        .action-buttons {
-            display: flex;
-            justify-content: flex-end;
-            margin-top: 20px;
             gap: 10px;
         }
         
+        .logo img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--light-primary);
+        }
+        
+        .auth-buttons {
+            display: flex;
+            gap: 15px;
+        }
+        
+        .auth-btn {
+            background: transparent;
+            color: var(--light-primary);
+            border: 1px solid var(--light-primary);
+            border-radius: 50px;
+            padding: 8px 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 500;
+        }
+        
+        .auth-btn:hover {
+            background: rgba(100, 255, 218, 0.1);
+            transform: translateY(-2px);
+        }
+        
+        .auth-btn.primary {
+            background: var(--light-primary);
+            color: var(--dark-primary);
+        }
+        
+        .auth-btn.primary:hover {
+            box-shadow: 0 5px 15px rgba(100, 255, 218, 0.3);
+        }
+        
+        main {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            gap: 30px;
+        }
+        
+        .hero {
+            text-align: center;
+            max-width: 600px;
+            animation: slideUp 1s ease-in-out;
+        }
+        
+        .hero h1 {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            background: linear-gradient(90deg, var(--light-primary), var(--light-secondary));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .hero p {
+            font-size: 1.1rem;
+            color: var(--text-secondary);
+        }
+        
+        .chat-container {
+            width: 100%;
+            max-width: 800px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .chat-box {
+            background: rgba(23, 42, 69, 0.5);
+            border-radius: 15px;
+            padding: 20px;
+            border: 1px solid rgba(100, 255, 218, 0.2);
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            height: 500px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        
+        .chat-box:hover {
+            border-color: var(--light-primary);
+        }
+        
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding-right: 10px;
+            display: flex;
+            flex-direction: column-reverse;
+        }
+        
+        .message {
+            padding: 10px 15px;
+            margin-bottom: 10px;
+            border-radius: 15px;
+            background: rgba(10, 25, 47, 0.5);
+            border: 1px solid rgba(100, 255, 218, 0.1);
+            animation: messageIn 0.3s ease-out;
+            max-width: 80%;
+            word-wrap: break-word;
+        }
+        
+        .message.user {
+            align-self: flex-end;
+            background: rgba(100, 255, 218, 0.1);
+            border-color: var(--light-primary);
+        }
+        
+        .message-info {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin-bottom: 5px;
+        }
+        
+        .user-avatar {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 1px solid var(--light-primary);
+        }
+        
+        .user-name {
+            font-weight: 500;
+            font-size: 0.9rem;
+            color: var(--light-primary);
+        }
+        
+        .message-time {
+            font-size: 0.7rem;
+            color: var(--text-secondary);
+        }
+        
+        .message-text {
+            font-size: 0.95rem;
+        }
+        
+        .chat-input {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .chat-input input {
+            flex: 1;
+            padding: 12px 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(100, 255, 218, 0.3);
+            border-radius: 50px;
+            color: var(--text-color);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .chat-input input:focus {
+            outline: none;
+            border-color: var(--light-primary);
+            box-shadow: 0 0 10px rgba(100, 255, 218, 0.2);
+        }
+        
+        .chat-input button {
+            padding: 12px 25px;
+            background: var(--light-primary);
+            color: var(--dark-primary);
+            border: none;
+            border-radius: 50px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .chat-input button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(100, 255, 218, 0.3);
+        }
+        
+        .chat-input button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+        
+        .online-users {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            justify-content: center;
+            padding: 15px 0;
+        }
+        
+        .online-user {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(10, 25, 47, 0.5);
+            padding: 8px 15px;
+            border-radius: 50px;
+            border: 1px solid rgba(100, 255, 218, 0.1);
+            transition: all 0.3s ease;
+        }
+        
+        .online-user:hover {
+            border-color: var(--light-primary);
+        }
+        
+        .online-user-avatar {
+            width: 25px;
+            height: 25px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        
+        /* Modal de Login/Cadastro */
         .modal {
             display: none;
             position: fixed;
@@ -235,777 +282,655 @@
             left: 0;
             width: 100%;
             height: 100%;
-            background-color: rgba(0, 0, 0, 0.5);
+            background: rgba(10, 25, 47, 0.9);
             z-index: 1000;
             justify-content: center;
             align-items: center;
+            animation: fadeIn 0.3s ease-in-out;
         }
         
         .modal-content {
-            background-color: var(--white);
-            padding: 30px;
-            border-radius: 10px;
-            width: 90%;
+            background: var(--medium-primary);
+            border-radius: 20px;
+            padding: 40px;
+            width: 100%;
             max-width: 500px;
-            max-height: 90vh;
-            overflow-y: auto;
+            position: relative;
+            border: 1px solid var(--light-primary);
+            box-shadow: 0 10px 30px rgba(100, 255, 218, 0.2);
+            animation: slideUp 0.5s ease-in-out;
         }
         
-        .modal-header {
+        .close-modal {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--text-secondary);
+            transition: all 0.3s ease;
+        }
+        
+        .close-modal:hover {
+            color: var(--light-primary);
+            transform: rotate(90deg);
+        }
+        
+        .modal h2 {
+            text-align: center;
+            margin-bottom: 30px;
+            color: var(--light-primary);
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            color: var(--text-color);
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(100, 255, 218, 0.3);
+            border-radius: 50px;
+            color: var(--text-color);
+            font-size: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus {
+            outline: none;
+            border-color: var(--light-primary);
+            box-shadow: 0 0 10px rgba(100, 255, 218, 0.2);
+        }
+        
+        .avatar-upload {
             display: flex;
-            justify-content: space-between;
+            flex-direction: column;
             align-items: center;
             margin-bottom: 20px;
         }
         
-        .close-modal {
-            font-size: 24px;
-            cursor: pointer;
-            color: #999;
+        .avatar-preview {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin-bottom: 15px;
+            border: 2px solid var(--light-primary);
         }
         
-        .close-modal:hover {
-            color: var(--text);
-        }
-        
-        .calendar {
+        .submit-btn {
             width: 100%;
-            margin-top: 20px;
-        }
-        
-        .calendar-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 10px;
-        }
-        
-        .calendar-title {
-            font-weight: bold;
-        }
-        
-        .calendar-grid {
-            display: grid;
-            grid-template-columns: repeat(7, 1fr);
-            gap: 5px;
-        }
-        
-        .calendar-day-header {
-            text-align: center;
-            font-weight: bold;
-            padding: 5px;
-        }
-        
-        .calendar-day {
-            aspect-ratio: 1;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            border-radius: 5px;
+            padding: 12px;
+            background: var(--light-primary);
+            color: var(--dark-primary);
+            border: none;
+            border-radius: 50px;
+            font-weight: 600;
             cursor: pointer;
-            transition: var(--transition);
-            position: relative;
+            transition: all 0.3s ease;
+            margin-top: 10px;
         }
         
-        .calendar-day:hover {
-            background-color: var(--primary-light);
+        .submit-btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(100, 255, 218, 0.3);
         }
         
-        .calendar-day.selected {
-            background-color: var(--primary);
-            color: var(--white);
-            opacity: 0.6;
+        .error-message {
+            color: #ff6b6b;
+            font-size: 0.9rem;
+            margin-top: 5px;
+            display: none;
         }
         
-        .calendar-day.disabled {
-            color: #ccc;
-            pointer-events: none;
-        }
-        
-        .summary {
+        .form-footer {
+            text-align: center;
             margin-top: 20px;
-            padding: 15px;
-            background-color: var(--light);
-            border-radius: 10px;
+            color: var(--text-secondary);
         }
         
-        .summary-item {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
+        .form-footer a {
+            color: var(--light-primary);
+            text-decoration: none;
+            transition: all 0.3s ease;
         }
         
-        .settings-card {
-            margin-top: 30px;
+        .form-footer a:hover {
+            text-decoration: underline;
         }
         
-        .fade-in {
-            animation: fadeIn 0.5s ease-in;
-        }
-        
-        .location-icon {
-            width: 16px;
-            height: 16px;
-            margin-right: 5px;
-            fill: currentColor;
-        }
-        
+        /* Animações */
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
         
+        @keyframes slideUp {
+            from { 
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes messageIn {
+            from { 
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to { 
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        /* Responsivo */
         @media (max-width: 768px) {
-            .workers-grid {
-                grid-template-columns: 1fr;
+            header {
+                padding: 15px 20px;
+            }
+            
+            .hero h1 {
+                font-size: 2rem;
+            }
+            
+            .chat-box {
+                height: 400px;
+            }
+            
+            .modal-content {
+                padding: 30px 20px;
             }
         }
     </style>
 </head>
 <body>
-    <div class="container">
-        <!-- Tela Principal -->
-        <div id="main-screen">
-            <header>
-                <h1>Gestão de Diárias</h1>
-                <button id="settings-btn" class="btn btn-outline">Configurações</button>
-            </header>
-            
-            <div class="card fade-in">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                    <h2>Funcionários</h2>
-                    <button id="add-worker-btn" class="btn btn-primary">+ Adicionar</button>
+    <header>
+        <div class="logo">
+            <img src="https://ui-avatars.com/api/?name=Edu+Touca&background=172a45&color=64ffda" alt="Logo">
+            <span>@edutouca</span>
+        </div>
+        <div class="auth-buttons" id="authButtons">
+            <button class="auth-btn" id="loginBtn">Entrar</button>
+            <button class="auth-btn primary" id="registerBtn">Criar Conta</button>
+        </div>
+        <div id="userProfile" style="display: none;">
+            <button class="auth-btn" id="logoutBtn">Sair</button>
+        </div>
+    </header>
+    
+    <main>
+        <section class="hero">
+            <h1>Chat da Comunidade</h1>
+            <p>Conecte-se e converse com outros fãs em tempo real</p>
+        </section>
+        
+        <div class="online-users" id="onlineUsers">
+            <!-- Usuários online serão exibidos aqui -->
+        </div>
+        
+        <div class="chat-container">
+            <div class="chat-box">
+                <div class="chat-messages" id="chatMessages">
+                    <!-- Mensagens serão exibidas aqui -->
                 </div>
-                
-                <div id="workers-container" class="workers-grid">
-                    <!-- Workers will be added here dynamically -->
+                <div class="chat-input">
+                    <input type="text" id="messageInput" placeholder="Digite sua mensagem..." disabled>
+                    <button id="sendButton" disabled>Enviar</button>
                 </div>
             </div>
         </div>
-        
-        <!-- Modal Adicionar Funcionário -->
-        <div id="add-worker-modal" class="modal">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h2>Adicionar Funcionário</h2>
-                    <span class="close-modal">&times;</span>
-                </div>
-                
+    </main>
+    
+    <!-- Modal de Login -->
+    <div class="modal" id="loginModal">
+        <div class="modal-content">
+            <span class="close-modal" id="closeLoginModal">&times;</span>
+            <h2>Entrar</h2>
+            <form id="loginForm">
                 <div class="form-group">
-                    <label for="worker-name">NOME</label>
-                    <input type="text" id="worker-name" placeholder="Nome do funcionário">
+                    <label for="loginEmail">Email</label>
+                    <input type="email" id="loginEmail" class="form-control" placeholder="seu@email.com" required>
+                    <div class="error-message" id="loginEmailError">Email não encontrado</div>
                 </div>
-                
                 <div class="form-group">
-                    <label for="worker-role">CARGO</label>
-                    <select id="worker-role">
-                        <option value="">Selecione um cargo</option>
-                        <option value="pedreiro">Pedreiro</option>
-                        <option value="ajudante">Ajudante</option>
-                    </select>
+                    <label for="loginPassword">Senha</label>
+                    <input type="password" id="loginPassword" class="form-control" placeholder="••••••••" required>
+                    <div class="error-message" id="loginPasswordError">Senha incorreta</div>
                 </div>
-                
+                <button type="submit" class="submit-btn">Entrar</button>
+            </form>
+            <div class="form-footer">
+                <p>Não tem uma conta? <a href="#" id="showRegisterForm">Crie uma agora</a></p>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal de Cadastro -->
+    <div class="modal" id="registerModal">
+        <div class="modal-content">
+            <span class="close-modal" id="closeRegisterModal">&times;</span>
+            <h2>Criar Conta</h2>
+            <form id="registerForm">
+                <div class="avatar-upload">
+                    <img id="avatarPreview" class="avatar-preview" src="https://ui-avatars.com/api/?name=Usuario&background=172a45&color=64ffda" alt="Preview do Avatar">
+                    <input type="file" id="avatarInput" accept="image/*" style="display: none;">
+                    <button type="button" class="submit-btn" id="uploadBtn" style="width: auto; padding: 8px 15px;">Escolher Foto</button>
+                </div>
                 <div class="form-group">
-                    <label for="worker-location">LOCAL DE TRABALHO (Opcional)</label>
-                    <input type="text" id="worker-location" placeholder="Ex: Obra do Centro, Casa da Praia">
+                    <label for="registerName">Nome</label>
+                    <input type="text" id="registerName" class="form-control" placeholder="Seu nome" required>
                 </div>
-                
-                <div class="action-buttons">
-                    <button id="cancel-add-worker" class="btn btn-outline">Cancelar</button>
-                    <button id="save-worker" class="btn btn-primary">Salvar</button>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Tela de Detalhes do Funcionário -->
-        <div id="detail-screen" style="display: none;">
-            <header>
-                <button id="back-to-main" class="btn btn-outline">← Voltar</button>
-                <h1 id="detail-title">Detalhes do Funcionário</h1>
-            </header>
-            
-            <div class="card fade-in">
-                <div style="display: flex; align-items: center; margin-bottom: 20px;">
-                    <img id="detail-avatar" src="" alt="Avatar" class="worker-avatar">
-                    <div>
-                        <div id="detail-worker-name" class="worker-name"></div>
-                        <div id="detail-worker-role" class="worker-role"></div>
-                        <div id="detail-worker-location" class="worker-location">
-                            <svg class="location-icon" viewBox="0 0 24 24">
-                                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
-                            </svg>
-                            <span id="location-text">Sem local definido</span>
-                        </div>
-                    </div>
-                </div>
-                
-                <div class="calendar">
-                    <div class="calendar-header">
-                        <div class="calendar-title" id="current-month">Maio 2025</div>
-                        <div>
-                            <button id="prev-month" class="btn btn-outline" style="padding: 5px 10px;">&lt;</button>
-                            <button id="next-month" class="btn btn-outline" style="padding: 5px 10px;">&gt;</button>
-                        </div>
-                    </div>
-                    
-                    <div class="calendar-grid" id="calendar-days-header">
-                        <div class="calendar-day-header">Dom</div>
-                        <div class="calendar-day-header">Seg</div>
-                        <div class="calendar-day-header">Ter</div>
-                        <div class="calendar-day-header">Qua</div>
-                        <div class="calendar-day-header">Qui</div>
-                        <div class="calendar-day-header">Sex</div>
-                        <div class="calendar-day-header">Sáb</div>
-                    </div>
-                    
-                    <div class="calendar-grid" id="calendar-days">
-                        <!-- Calendar days will be generated here -->
-                    </div>
-                </div>
-                
-                <div class="summary">
-                    <div class="summary-item">
-                        <span>Dias trabalhados:</span>
-                        <span id="days-worked">0</span>
-                    </div>
-                    <div class="summary-item">
-                        <span>Valor da diária:</span>
-                        <span id="daily-value">R$ 0,00</span>
-                    </div>
-                    <div class="summary-item" style="font-weight: bold;">
-                        <span>Valor total:</span>
-                        <span id="total-value">R$ 0,00</span>
-                    </div>
-                </div>
-                
-                <div class="action-buttons">
-                    <button id="clear-days" class="btn btn-danger">Desmarcar Todos</button>
-                    <button id="edit-location" class="btn btn-outline">Editar Local</button>
-                    <button id="generate-report" class="btn btn-primary">Gerar Dados</button>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Modal Configurações -->
-        <div id="settings-modal" class="modal">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h2>Configurações</h2>
-                    <span class="close-modal">&times;</span>
-                </div>
-                
-                <div class="card settings-card">
-                    <h3 style="margin-bottom: 15px;">Valor das Diárias</h3>
-                    
-                    <div class="form-group">
-                        <label for="pedreiro-value">Diária do Pedreiro (R$)</label>
-                        <input type="number" id="pedreiro-value" placeholder="Valor da diária do pedreiro" step="0.01">
-                    </div>
-                    
-                    <div class="form-group">
-                        <label for="ajudante-value">Diária do Ajudante (R$)</label>
-                        <input type="number" id="ajudante-value" placeholder="Valor da diária do ajudante" step="0.01">
-                    </div>
-                </div>
-                
-                <div class="action-buttons">
-                    <button id="cancel-settings" class="btn btn-outline">Cancelar</button>
-                    <button id="save-settings" class="btn btn-primary">Salvar</button>
-                </div>
-            </div>
-        </div>
-        
-        <!-- Modal Editar Local -->
-        <div id="edit-location-modal" class="modal">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h2>Editar Local de Trabalho</h2>
-                    <span class="close-modal">&times;</span>
-                </div>
-                
                 <div class="form-group">
-                    <label for="new-location">LOCAL DE TRABALHO</label>
-                    <input type="text" id="new-location" placeholder="Digite o novo local de trabalho">
+                    <label for="registerEmail">Email</label>
+                    <input type="email" id="registerEmail" class="form-control" placeholder="seu@email.com" required>
+                    <div class="error-message" id="registerEmailError">Email já em uso</div>
                 </div>
-                
-                <div class="action-buttons">
-                    <button id="cancel-edit-location" class="btn btn-outline">Cancelar</button>
-                    <button id="save-location" class="btn btn-primary">Salvar</button>
+                <div class="form-group">
+                    <label for="registerPassword">Senha</label>
+                    <input type="password" id="registerPassword" class="form-control" placeholder="••••••••" minlength="6" required>
                 </div>
-            </div>
-        </div>
-        
-        <!-- Modal Confirmar Exclusão -->
-        <div id="confirm-delete-modal" class="modal">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h2>Confirmar Exclusão</h2>
-                    <span class="close-modal">&times;</span>
+                <div class="form-group">
+                    <label for="registerConfirmPassword">Confirmar Senha</label>
+                    <input type="password" id="registerConfirmPassword" class="form-control" placeholder="••••••••" required>
+                    <div class="error-message" id="registerPasswordError">As senhas não coincidem</div>
                 </div>
-                
-                <p>Tem certeza que deseja excluir este funcionário? Esta ação não pode ser desfeita.</p>
-                
-                <div class="action-buttons">
-                    <button id="cancel-delete" class="btn btn-outline">Cancelar</button>
-                    <button id="confirm-delete" class="btn btn-danger">Excluir</button>
-                </div>
+                <button type="submit" class="submit-btn">Criar Conta</button>
+            </form>
+            <div class="form-footer">
+                <p>Já tem uma conta? <a href="#" id="showLoginForm">Faça login</a></p>
             </div>
         </div>
     </div>
 
-    <script>
-        // Dados da aplicação
-        const workers = JSON.parse(localStorage.getItem('workers')) || [];
-        const settings = JSON.parse(localStorage.getItem('settings')) || {
-            pedreiroValue: 150.00,
-            ajudanteValue: 100.00
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { 
+            getDatabase, 
+            ref, 
+            push, 
+            onChildAdded, 
+            onChildRemoved,
+            set,
+            onValue,
+            off
+        } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+        import { 
+            getAuth, 
+            createUserWithEmailAndPassword, 
+            signInWithEmailAndPassword, 
+            signOut,
+            onAuthStateChanged
+        } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
+        import { 
+            getStorage, 
+            ref as storageRef, 
+            uploadBytes, 
+            getDownloadURL 
+        } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
+
+        // Configuração do Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyDKmGLarATz78OSOp0e2IDNOPubW7B0xNE",
+            authDomain: "edutouca-edfc2.firebaseapp.com",
+            databaseURL: "https://edutouca-edfc2-default-rtdb.firebaseio.com",
+            projectId: "edutouca-edfc2",
+            storageBucket: "edutouca-edfc2.appspot.com",
+            messagingSenderId: "6769105138",
+            appId: "1:6769105138:web:484c92245104ec4652986b",
         };
-        
-        // Elementos da tela principal
-        const mainScreen = document.getElementById('main-screen');
-        const workersContainer = document.getElementById('workers-container');
-        const addWorkerBtn = document.getElementById('add-worker-btn');
-        const settingsBtn = document.getElementById('settings-btn');
-        
-        // Elementos do modal de adicionar funcionário
-        const addWorkerModal = document.getElementById('add-worker-modal');
-        const workerNameInput = document.getElementById('worker-name');
-        const workerRoleSelect = document.getElementById('worker-role');
-        const workerLocationInput = document.getElementById('worker-location');
-        const saveWorkerBtn = document.getElementById('save-worker');
-        const cancelAddWorkerBtn = document.getElementById('cancel-add-worker');
-        const closeModalBtns = document.querySelectorAll('.close-modal');
-        
-        // Elementos da tela de detalhes
-        const detailScreen = document.getElementById('detail-screen');
-        const backToMainBtn = document.getElementById('back-to-main');
-        const detailTitle = document.getElementById('detail-title');
-        const detailAvatar = document.getElementById('detail-avatar');
-        const detailWorkerName = document.getElementById('detail-worker-name');
-        const detailWorkerRole = document.getElementById('detail-worker-role');
-        const locationText = document.getElementById('location-text');
-        const currentMonthEl = document.getElementById('current-month');
-        const prevMonthBtn = document.getElementById('prev-month');
-        const nextMonthBtn = document.getElementById('next-month');
-        const calendarDays = document.getElementById('calendar-days');
-        const daysWorkedEl = document.getElementById('days-worked');
-        const dailyValueEl = document.getElementById('daily-value');
-        const totalValueEl = document.getElementById('total-value');
-        const generateReportBtn = document.getElementById('generate-report');
-        const editLocationBtn = document.getElementById('edit-location');
-        const clearDaysBtn = document.getElementById('clear-days');
-        
-        // Elementos do modal de configurações
-        const settingsModal = document.getElementById('settings-modal');
-        const pedreiroValueInput = document.getElementById('pedreiro-value');
-        const ajudanteValueInput = document.getElementById('ajudante-value');
-        const saveSettingsBtn = document.getElementById('save-settings');
-        const cancelSettingsBtn = document.getElementById('cancel-settings');
-        
-        // Elementos do modal de editar local
-        const editLocationModal = document.getElementById('edit-location-modal');
-        const newLocationInput = document.getElementById('new-location');
-        const saveLocationBtn = document.getElementById('save-location');
-        const cancelEditLocationBtn = document.getElementById('cancel-edit-location');
-        
-        // Elementos do modal de confirmar exclusão
-        const confirmDeleteModal = document.getElementById('confirm-delete-modal');
-        const confirmDeleteBtn = document.getElementById('confirm-delete');
-        const cancelDeleteBtn = document.getElementById('cancel-delete');
-        
-        // Variáveis de estado
-        let currentWorkerId = null;
-        let workerToDeleteId = null;
-        let currentDate = new Date();
-        let currentYear = currentDate.getFullYear();
-        let currentMonth = currentDate.getMonth();
-        
-        // URLs das imagens
-        const pedreiroImage = 'https://media.istockphoto.com/id/1217836258/pt/vetorial/bricklayer.webp?s=612x612&w=is&k=20&c=MeULEje41HJwFvMxMzdyv3xtyvp4LoLH6YJ6ostBPwU=';
-        const ajudanteImage = 'https://img.freepik.com/vetores-premium/um-homem-empurra-um-carrinho-de-mao-com-um-saco-de-areia_820658-3.jpg?w=1060';
-        
-        // Inicialização
-        document.addEventListener('DOMContentLoaded', () => {
-            renderWorkers();
-            loadSettings();
-            
-            // Carregar valores padrão se não existirem configurações salvas
-            if (!localStorage.getItem('settings')) {
-                saveSettings();
-            }
-        });
-        
+
+        // Inicializa o Firebase
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        const auth = getAuth(app);
+        const storage = getStorage(app);
+
+        // Referências do Firebase
+        const messagesRef = ref(db, "messages");
+        const usersRef = ref(db, "users");
+        const onlineUsersRef = ref(db, "onlineUsers");
+
+        // Elementos do DOM
+        const loginBtn = document.getElementById('loginBtn');
+        const registerBtn = document.getElementById('registerBtn');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const authButtons = document.getElementById('authButtons');
+        const userProfile = document.getElementById('userProfile');
+        const loginModal = document.getElementById('loginModal');
+        const registerModal = document.getElementById('registerModal');
+        const closeLoginModal = document.getElementById('closeLoginModal');
+        const closeRegisterModal = document.getElementById('closeRegisterModal');
+        const showRegisterForm = document.getElementById('showRegisterForm');
+        const showLoginForm = document.getElementById('showLoginForm');
+        const loginForm = document.getElementById('loginForm');
+        const registerForm = document.getElementById('registerForm');
+        const messageInput = document.getElementById('messageInput');
+        const sendButton = document.getElementById('sendButton');
+        const chatMessages = document.getElementById('chatMessages');
+        const onlineUsers = document.getElementById('onlineUsers');
+        const avatarInput = document.getElementById('avatarInput');
+        const avatarPreview = document.getElementById('avatarPreview');
+        const uploadBtn = document.getElementById('uploadBtn');
+
+        // Variáveis globais
+        let currentUser = null;
+        let userAvatarUrl = '';
+        let messageCount = 0;
+        const MAX_MESSAGES = 100;
+
         // Event Listeners
-        addWorkerBtn.addEventListener('click', () => {
-            workerNameInput.value = '';
-            workerRoleSelect.value = '';
-            workerLocationInput.value = '';
-            addWorkerModal.style.display = 'flex';
+        loginBtn.addEventListener('click', () => loginModal.style.display = 'flex');
+        registerBtn.addEventListener('click', () => registerModal.style.display = 'flex');
+        logoutBtn.addEventListener('click', signOutUser);
+        closeLoginModal.addEventListener('click', () => loginModal.style.display = 'none');
+        closeRegisterModal.addEventListener('click', () => registerModal.style.display = 'none');
+        showRegisterForm.addEventListener('click', (e) => {
+            e.preventDefault();
+            loginModal.style.display = 'none';
+            registerModal.style.display = 'flex';
         });
-        
-        settingsBtn.addEventListener('click', () => {
-            pedreiroValueInput.value = settings.pedreiroValue;
-            ajudanteValueInput.value = settings.ajudanteValue;
-            settingsModal.style.display = 'flex';
+        showLoginForm.addEventListener('click', (e) => {
+            e.preventDefault();
+            registerModal.style.display = 'none';
+            loginModal.style.display = 'flex';
         });
-        
-        saveWorkerBtn.addEventListener('click', saveWorker);
-        cancelAddWorkerBtn.addEventListener('click', () => {
-            addWorkerModal.style.display = 'none';
+        uploadBtn.addEventListener('click', () => avatarInput.click());
+        avatarInput.addEventListener('change', handleAvatarUpload);
+        sendButton.addEventListener('click', sendMessage);
+        messageInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') sendMessage();
         });
-        
-        backToMainBtn.addEventListener('click', () => {
-            detailScreen.style.display = 'none';
-            mainScreen.style.display = 'block';
-            renderWorkers();
-        });
-        
-        prevMonthBtn.addEventListener('click', () => {
-            currentMonth--;
-            if (currentMonth < 0) {
-                currentMonth = 11;
-                currentYear--;
-            }
-            renderCalendar();
-        });
-        
-        nextMonthBtn.addEventListener('click', () => {
-            currentMonth++;
-            if (currentMonth > 11) {
-                currentMonth = 0;
-                currentYear++;
-            }
-            renderCalendar();
-        });
-        
-        generateReportBtn.addEventListener('click', generateReport);
-        
-        saveSettingsBtn.addEventListener('click', saveSettings);
-        cancelSettingsBtn.addEventListener('click', () => {
-            settingsModal.style.display = 'none';
-        });
-        
-        editLocationBtn.addEventListener('click', () => {
-            const worker = workers.find(w => w.id === currentWorkerId);
-            if (worker) {
-                newLocationInput.value = worker.location || '';
-                editLocationModal.style.display = 'flex';
-            }
-        });
-        
-        saveLocationBtn.addEventListener('click', () => {
-            const worker = workers.find(w => w.id === currentWorkerId);
-            if (worker) {
-                worker.location = newLocationInput.value.trim();
-                saveWorkers();
-                updateWorkerDetails(worker);
-                editLocationModal.style.display = 'none';
-            }
-        });
-        
-        cancelEditLocationBtn.addEventListener('click', () => {
-            editLocationModal.style.display = 'none';
-        });
-        
-        clearDaysBtn.addEventListener('click', () => {
-            const worker = workers.find(w => w.id === currentWorkerId);
-            if (worker) {
-                worker.workedDays = [];
-                saveWorkers();
-                renderCalendar();
-                updateSummary();
-            }
-        });
-        
-        confirmDeleteBtn.addEventListener('click', () => {
-            if (workerToDeleteId) {
-                const index = workers.findIndex(w => w.id === workerToDeleteId);
-                if (index !== -1) {
-                    workers.splice(index, 1);
-                    saveWorkers();
-                    renderWorkers();
-                }
-                workerToDeleteId = null;
-                confirmDeleteModal.style.display = 'none';
-            }
-        });
-        
-        cancelDeleteBtn.addEventListener('click', () => {
-            workerToDeleteId = null;
-            confirmDeleteModal.style.display = 'none';
-        });
-        
-        closeModalBtns.forEach(btn => {
-            btn.addEventListener('click', () => {
-                addWorkerModal.style.display = 'none';
-                settingsModal.style.display = 'none';
-                editLocationModal.style.display = 'none';
-                confirmDeleteModal.style.display = 'none';
-            });
-        });
-        
-        // Fechar modal ao clicar fora
-        window.addEventListener('click', (e) => {
-            if (e.target === addWorkerModal) {
-                addWorkerModal.style.display = 'none';
-            }
-            if (e.target === settingsModal) {
-                settingsModal.style.display = 'none';
-            }
-            if (e.target === editLocationModal) {
-                editLocationModal.style.display = 'none';
-            }
-            if (e.target === confirmDeleteModal) {
-                confirmDeleteModal.style.display = 'none';
-            }
-        });
-        
-        // Funções
-        function renderWorkers() {
-            workersContainer.innerHTML = '';
+
+        // Formulário de Login
+        loginForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const email = document.getElementById('loginEmail').value;
+            const password = document.getElementById('loginPassword').value;
             
-            if (workers.length === 0) {
-                workersContainer.innerHTML = '<p>Nenhum funcionário cadastrado. Clique em "Adicionar" para começar.</p>';
-                return;
-            }
-            
-            workers.forEach(worker => {
-                const workerCard = document.createElement('div');
-                workerCard.className = 'worker-card';
-                workerCard.dataset.id = worker.id;
-                
-                workerCard.innerHTML = `
-                    <img src="${worker.role === 'pedreiro' ? pedreiroImage : ajudanteImage}" alt="${worker.role}" class="worker-avatar">
-                    <div class="worker-info">
-                        <div class="worker-name">${worker.name}</div>
-                        <div class="worker-role">${worker.role === 'pedreiro' ? 'Pedreiro' : 'Ajudante'}</div>
-                        ${worker.location ? `
-                            <div class="worker-location">
-                                <svg class="location-icon" viewBox="0 0 24 24">
-                                    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5s1.12-2.5 2.5-2.5 2.5 1.12 2.5 2.5-1.12 2.5-2.5 2.5z"/>
-                                </svg>
-                                ${worker.location}
-                            </div>
-                        ` : ''}
-                    </div>
-                    <button class="worker-delete" data-id="${worker.id}">×</button>
-                `;
-                
-                workerCard.addEventListener('click', (e) => {
-                    // Evitar que o clique no botão de deletar abra os detalhes
-                    if (!e.target.classList.contains('worker-delete')) {
-                        showWorkerDetail(worker.id);
+            signInWithEmailAndPassword(auth, email, password)
+                .then((userCredential) => {
+                    // Login bem-sucedido
+                    currentUser = userCredential.user;
+                    loginModal.style.display = 'none';
+                    updateUI();
+                    listenToUserData(currentUser.uid);
+                    setUserOnline(currentUser.uid);
+                })
+                .catch((error) => {
+                    // Tratamento de erros
+                    const errorCode = error.code;
+                    const errorMessage = error.message;
+                    
+                    if (errorCode === 'auth/user-not-found') {
+                        document.getElementById('loginEmailError').style.display = 'block';
+                        document.getElementById('loginPasswordError').style.display = 'none';
+                    } else if (errorCode === 'auth/wrong-password') {
+                        document.getElementById('loginPasswordError').style.display = 'block';
+                        document.getElementById('loginEmailError').style.display = 'none';
                     }
                 });
-                
-                // Adicionar evento ao botão de deletar
-                const deleteBtn = workerCard.querySelector('.worker-delete');
-                deleteBtn.addEventListener('click', (e) => {
-                    e.stopPropagation();
-                    workerToDeleteId = worker.id;
-                    confirmDeleteModal.style.display = 'flex';
+        });
+
+        // Formulário de Cadastro
+        registerForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+            const name = document.getElementById('registerName').value;
+            const email = document.getElementById('registerEmail').value;
+            const password = document.getElementById('registerPassword').value;
+            const confirmPassword = document.getElementById('registerConfirmPassword').value;
+            
+            // Validação de senha
+            if (password !== confirmPassword) {
+                document.getElementById('registerPasswordError').style.display = 'block';
+                return;
+            } else {
+                document.getElementById('registerPasswordError').style.display = 'none';
+            }
+            
+            createUserWithEmailAndPassword(auth, email, password)
+                .then((userCredential) => {
+                    // Cadastro bem-sucedido
+                    currentUser = userCredential.user;
+                    
+                    // Upload da foto de perfil se existir
+                    const avatarFile = avatarInput.files[0];
+                    if (avatarFile) {
+                        const avatarRef = storageRef(storage, `avatars/${currentUser.uid}`);
+                        return uploadBytes(avatarRef, avatarFile)
+                            .then(() => getDownloadURL(avatarRef))
+                            .then((url) => {
+                                userAvatarUrl = url;
+                                return saveUserData(currentUser.uid, name, email, url);
+                            });
+                    } else {
+                        // Usar avatar padrão
+                        userAvatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=172a45&color=64ffda`;
+                        return saveUserData(currentUser.uid, name, email, userAvatarUrl);
+                    }
+                })
+                .then(() => {
+                    registerModal.style.display = 'none';
+                    updateUI();
+                    setUserOnline(currentUser.uid);
+                })
+                .catch((error) => {
+                    const errorCode = error.code;
+                    const errorMessage = error.message;
+                    
+                    if (errorCode === 'auth/email-already-in-use') {
+                        document.getElementById('registerEmailError').style.display = 'block';
+                    }
                 });
-                
-                workersContainer.appendChild(workerCard);
+        });
+
+        // Funções
+        function handleAvatarUpload(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    avatarPreview.src = event.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        function saveUserData(userId, name, email, avatarUrl) {
+            return set(ref(db, `users/${userId}`), {
+                name: name,
+                email: email,
+                avatar: avatarUrl,
+                createdAt: new Date().toISOString()
             });
         }
-        
-        function saveWorker() {
-            const name = workerNameInput.value.trim();
-            const role = workerRoleSelect.value;
-            const location = workerLocationInput.value.trim();
-            
-            if (!name || !role) {
-                alert('Por favor, preencha todos os campos obrigatórios');
-                return;
-            }
-            
-            const newWorker = {
-                id: Date.now().toString(),
-                name,
-                role,
-                location: location || null,
-                workedDays: []
-            };
-            
-            workers.push(newWorker);
-            saveWorkers();
-            addWorkerModal.style.display = 'none';
-            renderWorkers();
-        }
-        
-        function showWorkerDetail(id) {
-            const worker = workers.find(w => w.id === id);
-            if (!worker) return;
-            
-            currentWorkerId = id;
-            mainScreen.style.display = 'none';
-            detailScreen.style.display = 'block';
-            
-            updateWorkerDetails(worker);
-            
-            // Resetar para o mês atual
-            currentDate = new Date();
-            currentYear = currentDate.getFullYear();
-            currentMonth = currentDate.getMonth();
-            
-            renderCalendar();
-            updateSummary();
-        }
-        
-        function updateWorkerDetails(worker) {
-            detailTitle.textContent = `Detalhes: ${worker.name}`;
-            detailWorkerName.textContent = worker.name;
-            detailWorkerRole.textContent = worker.role === 'pedreiro' ? 'Pedreiro' : 'Ajudante';
-            detailAvatar.src = worker.role === 'pedreiro' ? pedreiroImage : ajudanteImage;
-            locationText.textContent = worker.location || 'Sem local definido';
-        }
-        
-        function renderCalendar() {
-            const firstDay = new Date(currentYear, currentMonth, 1);
-            const lastDay = new Date(currentYear, currentMonth + 1, 0);
-            const daysInMonth = lastDay.getDate();
-            const startingDay = firstDay.getDay();
-            
-            currentMonthEl.textContent = `${getMonthName(currentMonth)} ${currentYear}`;
-            calendarDays.innerHTML = '';
-            
-            // Dias vazios no início
-            for (let i = 0; i < startingDay; i++) {
-                const emptyDay = document.createElement('div');
-                emptyDay.className = 'calendar-day disabled';
-                calendarDays.appendChild(emptyDay);
-            }
-            
-            // Dias do mês
-            const worker = workers.find(w => w.id === currentWorkerId);
-            
-            for (let day = 1; day <= daysInMonth; day++) {
-                const date = new Date(currentYear, currentMonth, day);
-                const dayElement = document.createElement('div');
-                dayElement.className = 'calendar-day';
-                dayElement.textContent = day;
-                dayElement.dataset.date = date.toISOString().split('T')[0];
-                
-                // Verificar se o dia está marcado como trabalhado
-                if (worker && worker.workedDays.includes(date.toISOString().split('T')[0])) {
-                    dayElement.classList.add('selected');
+
+        function listenToUserData(userId) {
+            const userRef = ref(db, `users/${userId}`);
+            onValue(userRef, (snapshot) => {
+                const userData = snapshot.val();
+                if (userData) {
+                    userAvatarUrl = userData.avatar;
+                    document.querySelector('.logo img').src = userAvatarUrl;
                 }
-                
-                dayElement.addEventListener('click', () => toggleWorkDay(date, dayElement));
-                calendarDays.appendChild(dayElement);
-            }
+            });
         }
-        
-        function toggleWorkDay(date, element) {
-            const dateStr = date.toISOString().split('T')[0];
-            const worker = workers.find(w => w.id === currentWorkerId);
+
+        function setUserOnline(userId) {
+            const userOnlineRef = ref(db, `onlineUsers/${userId}`);
+            set(userOnlineRef, true);
             
-            if (!worker) return;
-            
-            const index = worker.workedDays.indexOf(dateStr);
-            
-            if (index === -1) {
-                worker.workedDays.push(dateStr);
-                element.classList.add('selected');
+            // Quando o usuário sair, remover da lista de online
+            onAuthStateChanged(auth, (user) => {
+                if (!user) {
+                    set(userOnlineRef, null);
+                }
+            });
+        }
+
+        function signOutUser() {
+            signOut(auth).then(() => {
+                currentUser = null;
+                updateUI();
+            }).catch((error) => {
+                console.error('Erro ao sair:', error);
+            });
+        }
+
+        function updateUI() {
+            if (currentUser) {
+                authButtons.style.display = 'none';
+                userProfile.style.display = 'block';
+                messageInput.disabled = false;
+                sendButton.disabled = false;
             } else {
-                worker.workedDays.splice(index, 1);
-                element.classList.remove('selected');
+                authButtons.style.display = 'flex';
+                userProfile.style.display = 'none';
+                messageInput.disabled = true;
+                sendButton.disabled = true;
             }
-            
-            saveWorkers();
-            updateSummary();
         }
-        
-        function updateSummary() {
-            const worker = workers.find(w => w.id === currentWorkerId);
-            if (!worker) return;
+
+        function sendMessage() {
+            const messageText = messageInput.value.trim();
+            if (!messageText || !currentUser) return;
             
-            const daysWorked = worker.workedDays.length;
-            const dailyValue = worker.role === 'pedreiro' ? settings.pedreiroValue : settings.ajudanteValue;
-            const totalValue = daysWorked * dailyValue;
-            
-            daysWorkedEl.textContent = daysWorked;
-            dailyValueEl.textContent = `R$ ${dailyValue.toFixed(2)}`.replace('.', ',');
-            totalValueEl.textContent = `R$ ${totalValue.toFixed(2)}`.replace('.', ',');
-        }
-        
-        function generateReport() {
-            const worker = workers.find(w => w.id === currentWorkerId);
-            if (!worker) return;
-            
-            const dailyValue = worker.role === 'pedreiro' ? settings.pedreiroValue : settings.ajudanteValue;
-            const totalValue = worker.workedDays.length * dailyValue;
-            
-            const report = {
-                nome: worker.name,
-                cargo: worker.role === 'pedreiro' ? 'Pedreiro' : 'Ajudante',
-                local: worker.location || 'Não informado',
-                quantidadeDiasTrabalhados: worker.workedDays.length,
-                valorDiaria: dailyValue,
-                valorTotal: totalValue,
-                diasTrabalhados: worker.workedDays.sort()
+            const newMessage = {
+                text: messageText,
+                userId: currentUser.uid,
+                name: currentUser.displayName || 'Anônimo',
+                avatar: userAvatarUrl,
+                timestamp: new Date().getTime()
             };
             
-            // Criar e fazer download do arquivo JSON
-            const dataStr = JSON.stringify(report, null, 2);
-            const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
-            
-            const exportFileDefaultName = `relatorio_${worker.name}_${getMonthName(currentMonth)}_${currentYear}.json`;
-            
-            // Criar link para download
-            const linkElement = document.createElement('a');
-            linkElement.setAttribute('href', dataUri);
-            linkElement.setAttribute('download', exportFileDefaultName);
-            
-            // Primeiro faz o download
-            linkElement.click();
-            
-            // Depois prepara para enviar pelo WhatsApp
-            const whatsappMessage = `*Relatório de ${worker.name}*\n\n` +
-                                   `*Cargo:* ${report.cargo}\n` +
-                                   `*Local:* ${report.local}\n` +
-                                   `*Dias trabalhados:* ${report.quantidadeDiasTrabalhados}\n` +
-                                   `*Valor diária:* R$ ${dailyValue.toFixed(2)}\n` +
-                                   `*Total a receber:* R$ ${totalValue.toFixed(2)}`;
-            
-            // Codificar a mensagem para URL
-            const encodedMessage = encodeURIComponent(whatsappMessage);
-            
-            // Abrir WhatsApp após um pequeno delay para garantir o download
-            setTimeout(() => {
-                window.open(`https://wa.me/?text=${encodedMessage}`, '_blank');
-            }, 500);
+            push(messagesRef, newMessage)
+                .then(() => {
+                    messageInput.value = '';
+                })
+                .catch((error) => {
+                    console.error('Erro ao enviar mensagem:', error);
+                });
         }
-        
-        function saveWorkers() {
-            localStorage.setItem('workers', JSON.stringify(workers));
-        }
-        
-        function loadSettings() {
-            pedreiroValueInput.value = settings.pedreiroValue;
-            ajudanteValueInput.value = settings.ajudanteValue;
-        }
-        
-        function saveSettings() {
-            settings.pedreiroValue = parseFloat(pedreiroValueInput.value) || 150.00;
-            settings.ajudanteValue = parseFloat(ajudanteValueInput.value) || 100.00;
-            localStorage.setItem('settings', JSON.stringify(settings));
-            settingsModal.style.display = 'none';
+
+        function displayMessage(messageData) {
+            // Limitar o número de mensagens exibidas
+            messageCount++;
+            if (messageCount > MAX_MESSAGES) {
+                const messages = chatMessages.children;
+                if (messages.length > MAX_MESSAGES) {
+                    chatMessages.removeChild(messages[messages.length - 1]);
+                }
+            }
             
-            // Atualizar resumo se estiver na tela de detalhes
-            if (currentWorkerId) {
-                updateSummary();
+            const isCurrentUser = currentUser && messageData.userId === currentUser.uid;
+            const messageElement = document.createElement('div');
+            messageElement.className = `message ${isCurrentUser ? 'user' : ''}`;
+            
+            const time = new Date(messageData.timestamp);
+            const timeString = time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+            
+            messageElement.innerHTML = `
+                <div class="message-info">
+                    <img src="${messageData.avatar}" alt="${messageData.name}" class="user-avatar">
+                    <span class="user-name">${messageData.name}</span>
+                    <span class="message-time">${timeString}</span>
+                </div>
+                <div class="message-text">${messageData.text}</div>
+            `;
+            
+            // Adiciona no início (como estamos usando column-reverse, parece que adiciona no final)
+            chatMessages.insertBefore(messageElement, chatMessages.firstChild);
+            
+            // Animação de scroll suave para novas mensagens
+            if (isCurrentUser) {
+                setTimeout(() => {
+                    chatMessages.scrollTo({ top: 0, behavior: 'smooth' });
+                }, 100);
             }
         }
-        
-        function getMonthName(monthIndex) {
-            const months = [
-                'Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho',
-                'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'
-            ];
-            return months[monthIndex];
+
+        function displayOnlineUser(userId, userData) {
+            const userElement = document.createElement('div');
+            userElement.className = 'online-user';
+            userElement.innerHTML = `
+                <img src="${userData.avatar}" alt="${userData.name}" class="online-user-avatar">
+                <span>${userData.name}</span>
+            `;
+            userElement.id = `user-${userId}`;
+            
+            const existingUser = document.getElementById(`user-${userId}`);
+            if (existingUser) {
+                onlineUsers.replaceChild(userElement, existingUser);
+            } else {
+                onlineUsers.appendChild(userElement);
+            }
         }
+
+        function removeOnlineUser(userId) {
+            const userElement = document.getElementById(`user-${userId}`);
+            if (userElement) {
+                onlineUsers.removeChild(userElement);
+            }
+        }
+
+        // Ouvintes do Firebase
+        onChildAdded(messagesRef, (snapshot) => {
+            const messageData = snapshot.val();
+            displayMessage(messageData);
+        });
+
+        // Ouvinte para usuários online
+        onChildAdded(onlineUsersRef, (snapshot) => {
+            const userId = snapshot.key;
+            const userRef = ref(db, `users/${userId}`);
+            
+            onValue(userRef, (userSnapshot) => {
+                const userData = userSnapshot.val();
+                if (userData) {
+                    displayOnlineUser(userId, userData);
+                }
+            });
+        });
+
+        onChildRemoved(onlineUsersRef, (snapshot) => {
+            const userId = snapshot.key;
+            removeOnlineUser(userId);
+        });
+
+        // Verifica estado de autenticação ao carregar a página
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                currentUser = user;
+                updateUI();
+                listenToUserData(user.uid);
+                setUserOnline(user.uid);
+            } else {
+                currentUser = null;
+                updateUI();
+            }
+        });
+
+        // Fechar modais ao clicar fora
+        window.addEventListener('click', (e) => {
+            if (e.target === loginModal) loginModal.style.display = 'none';
+            if (e.target === registerModal) registerModal.style.display = 'none';
+        });
     </script>
 </body>
 </html>
