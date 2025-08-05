@@ -1,936 +1,749 @@
 <!DOCTYPE html>
-<html lang="pt-BR">
+<html lang="pt">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>@edutouca - Chat</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
-        
-        :root {
-            --dark-primary: #0a192f;
-            --medium-primary: #172a45;
-            --light-primary: #64ffda;
-            --dark-secondary: #150a1f;
-            --medium-secondary: #2a1745;
-            --light-secondary: #da64ff;
-            --text-color: #ccd6f6;
-            --text-secondary: #8892b0;
-        }
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Poppins', sans-serif;
-        }
-        
-        body {
-            background-color: var(--dark-primary);
-            color: var(--text-color);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            overflow-x: hidden;
-        }
-        
-        header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 20px 40px;
-            animation: fadeIn 1s ease-in-out;
-        }
-        
-        .logo {
-            font-size: 24px;
-            font-weight: 600;
-            color: var(--light-primary);
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .logo img {
-            width: 40px;
-            height: 40px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 2px solid var(--light-primary);
-        }
-        
-        .auth-buttons {
-            display: flex;
-            gap: 15px;
-        }
-        
-        .auth-btn {
-            background: transparent;
-            color: var(--light-primary);
-            border: 1px solid var(--light-primary);
-            border-radius: 50px;
-            padding: 8px 20px;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            font-weight: 500;
-        }
-        
-        .auth-btn:hover {
-            background: rgba(100, 255, 218, 0.1);
-            transform: translateY(-2px);
-        }
-        
-        .auth-btn.primary {
-            background: var(--light-primary);
-            color: var(--dark-primary);
-        }
-        
-        .auth-btn.primary:hover {
-            box-shadow: 0 5px 15px rgba(100, 255, 218, 0.3);
-        }
-        
-        main {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding: 20px;
-            gap: 30px;
-        }
-        
-        .hero {
-            text-align: center;
-            max-width: 600px;
-            animation: slideUp 1s ease-in-out;
-        }
-        
-        .hero h1 {
-            font-size: 2.5rem;
-            margin-bottom: 15px;
-            background: linear-gradient(90deg, var(--light-primary), var(--light-secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-        }
-        
-        .hero p {
-            font-size: 1.1rem;
-            color: var(--text-secondary);
-        }
-        
-        .chat-container {
-            width: 100%;
-            max-width: 800px;
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-        
-        .chat-box {
-            background: rgba(23, 42, 69, 0.5);
-            border-radius: 15px;
-            padding: 20px;
-            border: 1px solid rgba(100, 255, 218, 0.2);
-            backdrop-filter: blur(10px);
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-            height: 500px;
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            transition: all 0.3s ease;
-        }
-        
-        .chat-box:hover {
-            border-color: var(--light-primary);
-        }
-        
-        .chat-messages {
-            flex: 1;
-            overflow-y: auto;
-            padding-right: 10px;
-            display: flex;
-            flex-direction: column-reverse;
-        }
-        
-        .message {
-            padding: 10px 15px;
-            margin-bottom: 10px;
-            border-radius: 15px;
-            background: rgba(10, 25, 47, 0.5);
-            border: 1px solid rgba(100, 255, 218, 0.1);
-            animation: messageIn 0.3s ease-out;
-            max-width: 80%;
-            word-wrap: break-word;
-        }
-        
-        .message.user {
-            align-self: flex-end;
-            background: rgba(100, 255, 218, 0.1);
-            border-color: var(--light-primary);
-        }
-        
-        .message-info {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            margin-bottom: 5px;
-        }
-        
-        .user-avatar {
-            width: 30px;
-            height: 30px;
-            border-radius: 50%;
-            object-fit: cover;
-            border: 1px solid var(--light-primary);
-        }
-        
-        .user-name {
-            font-weight: 500;
-            font-size: 0.9rem;
-            color: var(--light-primary);
-        }
-        
-        .message-time {
-            font-size: 0.7rem;
-            color: var(--text-secondary);
-        }
-        
-        .message-text {
-            font-size: 0.95rem;
-        }
-        
-        .chat-input {
-            display: flex;
-            gap: 10px;
-            margin-top: 15px;
-        }
-        
-        .chat-input input {
-            flex: 1;
-            padding: 12px 15px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(100, 255, 218, 0.3);
-            border-radius: 50px;
-            color: var(--text-color);
-            font-size: 1rem;
-            transition: all 0.3s ease;
-        }
-        
-        .chat-input input:focus {
-            outline: none;
-            border-color: var(--light-primary);
-            box-shadow: 0 0 10px rgba(100, 255, 218, 0.2);
-        }
-        
-        .chat-input button {
-            padding: 12px 25px;
-            background: var(--light-primary);
-            color: var(--dark-primary);
-            border: none;
-            border-radius: 50px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-        
-        .chat-input button:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(100, 255, 218, 0.3);
-        }
-        
-        .chat-input button:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-        
-        .online-users {
-            display: flex;
-            gap: 10px;
-            flex-wrap: wrap;
-            justify-content: center;
-            padding: 15px 0;
-        }
-        
-        .online-user {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            background: rgba(10, 25, 47, 0.5);
-            padding: 8px 15px;
-            border-radius: 50px;
-            border: 1px solid rgba(100, 255, 218, 0.1);
-            transition: all 0.3s ease;
-        }
-        
-        .online-user:hover {
-            border-color: var(--light-primary);
-        }
-        
-        .online-user-avatar {
-            width: 25px;
-            height: 25px;
-            border-radius: 50%;
-            object-fit: cover;
-        }
-        
-        /* Modal de Login/Cadastro */
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(10, 25, 47, 0.9);
-            z-index: 1000;
-            justify-content: center;
-            align-items: center;
-            animation: fadeIn 0.3s ease-in-out;
-        }
-        
-        .modal-content {
-            background: var(--medium-primary);
-            border-radius: 20px;
-            padding: 40px;
-            width: 100%;
-            max-width: 500px;
-            position: relative;
-            border: 1px solid var(--light-primary);
-            box-shadow: 0 10px 30px rgba(100, 255, 218, 0.2);
-            animation: slideUp 0.5s ease-in-out;
-        }
-        
-        .close-modal {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            font-size: 1.5rem;
-            cursor: pointer;
-            color: var(--text-secondary);
-            transition: all 0.3s ease;
-        }
-        
-        .close-modal:hover {
-            color: var(--light-primary);
-            transform: rotate(90deg);
-        }
-        
-        .modal h2 {
-            text-align: center;
-            margin-bottom: 30px;
-            color: var(--light-primary);
-        }
-        
-        .form-group {
-            margin-bottom: 20px;
-        }
-        
-        .form-group label {
-            display: block;
-            margin-bottom: 8px;
-            color: var(--text-color);
-        }
-        
-        .form-control {
-            width: 100%;
-            padding: 12px 15px;
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(100, 255, 218, 0.3);
-            border-radius: 50px;
-            color: var(--text-color);
-            font-size: 1rem;
-            transition: all 0.3s ease;
-        }
-        
-        .form-control:focus {
-            outline: none;
-            border-color: var(--light-primary);
-            box-shadow: 0 0 10px rgba(100, 255, 218, 0.2);
-        }
-        
-        .avatar-upload {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin-bottom: 20px;
-        }
-        
-        .avatar-preview {
-            width: 100px;
-            height: 100px;
-            border-radius: 50%;
-            object-fit: cover;
-            margin-bottom: 15px;
-            border: 2px solid var(--light-primary);
-        }
-        
-        .submit-btn {
-            width: 100%;
-            padding: 12px;
-            background: var(--light-primary);
-            color: var(--dark-primary);
-            border: none;
-            border-radius: 50px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            margin-top: 10px;
-        }
-        
-        .submit-btn:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 20px rgba(100, 255, 218, 0.3);
-        }
-        
-        .error-message {
-            color: #ff6b6b;
-            font-size: 0.9rem;
-            margin-top: 5px;
-            display: none;
-        }
-        
-        .form-footer {
-            text-align: center;
-            margin-top: 20px;
-            color: var(--text-secondary);
-        }
-        
-        .form-footer a {
-            color: var(--light-primary);
-            text-decoration: none;
-            transition: all 0.3s ease;
-        }
-        
-        .form-footer a:hover {
-            text-decoration: underline;
-        }
-        
-        /* Animações */
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; }
-        }
-        
-        @keyframes slideUp {
-            from { 
-                opacity: 0;
-                transform: translateY(50px);
-            }
-            to { 
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        @keyframes messageIn {
-            from { 
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to { 
-                opacity: 1;
-                transform: translateY(0);
-            }
-        }
-        
-        @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
-        }
-        
-        /* Responsivo */
-        @media (max-width: 768px) {
-            header {
-                padding: 15px 20px;
-            }
-            
-            .hero h1 {
-                font-size: 2rem;
-            }
-            
-            .chat-box {
-                height: 400px;
-            }
-            
-            .modal-content {
-                padding: 30px 20px;
-            }
-        }
-    </style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tierlist Supers</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <style>
+    :root {
+      --accent: #4d79ff;
+      --bg-dark: #121212;
+      --bg-darker: #0a0a0a;
+      --text: #f5f5f5;
+      --tier-100: #4CAF50;
+      --tier-75: #8BC34A;
+      --tier-50: #FFC107;
+      --tier-25: #FF9800;
+      --tier-0: #F44336;
+      --modal-bg: rgba(0, 0, 0, 0.8);
+      --modal-content: #1e1e1e;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 20px;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: var(--bg-dark);
+      color: var(--text);
+      overflow-x: hidden;
+      min-height: 100vh;
+      touch-action: none; /* Importante para evitar conflitos com touch */
+    }
+    h1 {
+      text-align: center;
+      color: white;
+      margin-bottom: 30px;
+      font-size: 2rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 15px;
+    }
+    .tier-container {
+      max-width: 1000px;
+      margin: 20px auto;
+      display: flex;
+      flex-direction: column;
+      gap: 15px;
+    }
+    .tier {
+      background: var(--bg-darker);
+      border-radius: 12px;
+      border-left: 6px solid;
+      padding: 15px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      transition: all 0.3s ease;
+      position: relative;
+      overflow-x: auto;
+    }
+    .tier[data-tier="100"] { border-color: var(--tier-100); }
+    .tier[data-tier="75"] { border-color: var(--tier-75); }
+    .tier[data-tier="50"] { border-color: var(--tier-50); }
+    .tier[data-tier="25"] { border-color: var(--tier-25); }
+    .tier[data-tier="0"] { border-color: var(--tier-0); }
+    .tier-label {
+      font-weight: bold;
+      font-size: 1.1rem;
+      margin-bottom: 5px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .tier-content {
+      display: flex;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      gap: 15px;
+      min-height: 120px;
+      background: rgba(255,255,255,0.05);
+      border-radius: 8px;
+      padding: 10px;
+      transition: all 0.3s;
+    }
+    .character-container {
+      position: relative;
+      width: 100px;
+      text-align: center;
+      pointer-events: auto;
+      user-select: none;
+      transition: transform 0.3s ease;
+    }
+    .character-container:hover {
+      transform: translateY(-5px);
+    }
+    .character {
+      width: 100px;
+      height: 100px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 3px solid #333;
+      box-shadow: 0 4px 8px rgba(0,0,0,0.5);
+      transition: transform 0.3s, box-shadow 0.3s;
+      cursor: grab;
+    }
+    .character:active {
+      cursor: grabbing;
+    }
+    .character.dragging {
+      transform: scale(1.2);
+      opacity: 0.8;
+      z-index: 1000;
+      position: fixed; /* Alterado para fixed para evitar problemas de posicionamento */
+      pointer-events: none;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.7);
+      animation: pulse 0.8s infinite alternate;
+    }
+    @keyframes pulse {
+      from { box-shadow: 0 0 10px rgba(255, 255, 255, 0.5); }
+      to { box-shadow: 0 0 20px rgba(255, 255, 255, 0.8); }
+    }
+    .character-name {
+      font-size: 0.8rem;
+      color: white;
+      margin-top: 5px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .character-pool {
+      max-width: 1000px;
+      margin: 40px auto 0 auto;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      padding-bottom: 10px;
+      justify-content: center;
+    }
+    .delete-btn {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      background: #ff4d4d;
+      border: none;
+      border-radius: 50%;
+      width: 24px;
+      height: 24px;
+      color: white;
+      font-size: 12px;
+      cursor: pointer;
+      opacity: 0;
+      transition: opacity 0.3s, transform 0.3s;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+    }
+    .character-container:hover .delete-btn {
+      opacity: 1;
+    }
+    .delete-btn:hover {
+      transform: scale(1.2);
+      background: #ff1a1a;
+    }
+    .controls {
+      max-width: 1000px;
+      margin: 20px auto;
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+    }
+    .btn {
+      background: var(--accent);
+      color: white;
+      border: none;
+      padding: 10px 20px;
+      border-radius: 30px;
+      cursor: pointer;
+      font-weight: bold;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.3s;
+    }
+    .btn:hover {
+      background: #3a5fcc;
+      transform: translateY(-3px);
+      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+    }
+    .btn i {
+      font-size: 1.2rem;
+    }
+    .modal {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--modal-bg);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 10000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.3s;
+    }
+    .modal.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+    .modal-content {
+      background: var(--modal-content);
+      border-radius: 12px;
+      padding: 25px;
+      width: 90%;
+      max-width: 500px;
+      transform: translateY(20px);
+      transition: transform 0.3s;
+    }
+    .modal.active .modal-content {
+      transform: translateY(0);
+    }
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+    .modal-title {
+      font-size: 1.5rem;
+      margin: 0;
+    }
+    .close-modal {
+      background: none;
+      border: none;
+      color: var(--text);
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+    .form-group {
+      margin-bottom: 20px;
+    }
+    label {
+      display: block;
+      margin-bottom: 8px;
+      font-weight: 500;
+    }
+    input[type="text"],
+    input[type="file"] {
+      width: 100%;
+      padding: 12px;
+      border-radius: 8px;
+      border: 1px solid #333;
+      background: rgba(255,255,255,0.05);
+      color: var(--text);
+    }
+    .preview-container {
+      margin: 15px 0;
+      text-align: center;
+    }
+    #image-preview {
+      width: 120px;
+      height: 120px;
+      border-radius: 50%;
+      object-fit: cover;
+      border: 2px dashed var(--accent);
+      background: rgba(255,255,255,0.05);
+      display: none;
+    }
+    .submit-btn {
+      background: var(--tier-100);
+      color: white;
+      border: none;
+      padding: 12px 25px;
+      border-radius: 30px;
+      cursor: pointer;
+      font-weight: bold;
+      width: 100%;
+      transition: background 0.3s;
+    }
+    .submit-btn:hover {
+      background: #3d8b40;
+    }
+    .empty-message {
+      color: rgba(255,255,255,0.4);
+      font-style: italic;
+      text-align: center;
+      width: 100%;
+      padding: 20px;
+    }
+    @media (max-width: 768px) {
+      .tier-content {
+        min-height: 100px;
+      }
+      .character, .character-container {
+        width: 80px;
+        height: 80px;
+      }
+      .character-name {
+        font-size: 0.7rem;
+      }
+    }
+    .drop-target {
+      animation: highlight 0.5s;
+    }
+    @keyframes highlight {
+      0% { background: rgba(77, 121, 255, 0.1); }
+      100% { background: rgba(255,255,255,0.05); }
+    }
+  </style>
 </head>
 <body>
-    <header>
-        <div class="logo">
-            <img src="https://ui-avatars.com/api/?name=Edu+Touca&background=172a45&color=64ffda" alt="Logo">
-            <span>@edutouca</span>
-        </div>
-        <div class="auth-buttons" id="authButtons">
-            <button class="auth-btn" id="loginBtn">Entrar</button>
-            <button class="auth-btn primary" id="registerBtn">Criar Conta</button>
-        </div>
-        <div id="userProfile" style="display: none;">
-            <button class="auth-btn" id="logoutBtn">Sair</button>
-        </div>
-    </header>
-    
-    <main>
-        <section class="hero">
-            <h1>Chat da Comunidade</h1>
-            <p>Conecte-se e converse com outros fãs em tempo real</p>
-        </section>
-        
-        <div class="online-users" id="onlineUsers">
-            <!-- Usuários online serão exibidos aqui -->
-        </div>
-        
-        <div class="chat-container">
-            <div class="chat-box">
-                <div class="chat-messages" id="chatMessages">
-                    <!-- Mensagens serão exibidas aqui -->
-                </div>
-                <div class="chat-input">
-                    <input type="text" id="messageInput" placeholder="Digite sua mensagem..." disabled>
-                    <button id="sendButton" disabled>Enviar</button>
-                </div>
-            </div>
-        </div>
-    </main>
-    
-    <!-- Modal de Login -->
-    <div class="modal" id="loginModal">
-        <div class="modal-content">
-            <span class="close-modal" id="closeLoginModal">&times;</span>
-            <h2>Entrar</h2>
-            <form id="loginForm">
-                <div class="form-group">
-                    <label for="loginEmail">Email</label>
-                    <input type="email" id="loginEmail" class="form-control" placeholder="seu@email.com" required>
-                    <div class="error-message" id="loginEmailError">Email não encontrado</div>
-                </div>
-                <div class="form-group">
-                    <label for="loginPassword">Senha</label>
-                    <input type="password" id="loginPassword" class="form-control" placeholder="••••••••" required>
-                    <div class="error-message" id="loginPasswordError">Senha incorreta</div>
-                </div>
-                <button type="submit" class="submit-btn">Entrar</button>
-            </form>
-            <div class="form-footer">
-                <p>Não tem uma conta? <a href="#" id="showRegisterForm">Crie uma agora</a></p>
-            </div>
-        </div>
+  <h1><i class="fas fa-layer-group"></i> Tierlist Supers</h1>
+  
+  <div class="controls">
+    <button class="btn" id="add-character-btn">
+      <i class="fas fa-plus-circle"></i> Adicionar Personagem
+    </button>
+    <button class="btn" id="reset-btn">
+      <i class="fas fa-redo-alt"></i> Resetar Tierlist
+    </button>
+  </div>
+  
+  <div class="tier-container">
+    <div class="tier" data-tier="100">
+      <div class="tier-label">
+        <span>100% TOP TIER</span>
+        <i class="fas fa-crown" style="color: var(--tier-100);"></i>
+      </div>
+      <div class="tier-content" data-drop="100"></div>
     </div>
-    
-    <!-- Modal de Cadastro -->
-    <div class="modal" id="registerModal">
-        <div class="modal-content">
-            <span class="close-modal" id="closeRegisterModal">&times;</span>
-            <h2>Criar Conta</h2>
-            <form id="registerForm">
-                <div class="avatar-upload">
-                    <img id="avatarPreview" class="avatar-preview" src="https://ui-avatars.com/api/?name=Usuario&background=172a45&color=64ffda" alt="Preview do Avatar">
-                    <input type="file" id="avatarInput" accept="image/*" style="display: none;">
-                    <button type="button" class="submit-btn" id="uploadBtn" style="width: auto; padding: 8px 15px;">Escolher Foto</button>
-                </div>
-                <div class="form-group">
-                    <label for="registerName">Nome</label>
-                    <input type="text" id="registerName" class="form-control" placeholder="Seu nome" required>
-                </div>
-                <div class="form-group">
-                    <label for="registerEmail">Email</label>
-                    <input type="email" id="registerEmail" class="form-control" placeholder="seu@email.com" required>
-                    <div class="error-message" id="registerEmailError">Email já em uso</div>
-                </div>
-                <div class="form-group">
-                    <label for="registerPassword">Senha</label>
-                    <input type="password" id="registerPassword" class="form-control" placeholder="••••••••" minlength="6" required>
-                </div>
-                <div class="form-group">
-                    <label for="registerConfirmPassword">Confirmar Senha</label>
-                    <input type="password" id="registerConfirmPassword" class="form-control" placeholder="••••••••" required>
-                    <div class="error-message" id="registerPasswordError">As senhas não coincidem</div>
-                </div>
-                <button type="submit" class="submit-btn">Criar Conta</button>
-            </form>
-            <div class="form-footer">
-                <p>Já tem uma conta? <a href="#" id="showLoginForm">Faça login</a></p>
-            </div>
-        </div>
+    <div class="tier" data-tier="75">
+      <div class="tier-label">
+        <span>75% EXCELENTE</span>
+        <i class="fas fa-star" style="color: var(--tier-75);"></i>
+      </div>
+      <div class="tier-content" data-drop="75"></div>
     </div>
+    <div class="tier" data-tier="50">
+      <div class="tier-label">
+        <span>50% MÉDIO</span>
+        <i class="fas fa-exchange-alt" style="color: var(--tier-50);"></i>
+      </div>
+      <div class="tier-content" data-drop="50"></div>
+    </div>
+    <div class="tier" data-tier="25">
+      <div class="tier-label">
+        <span>25% FRACO</span>
+        <i class="fas fa-exclamation-triangle" style="color: var(--tier-25);"></i>
+      </div>
+      <div class="tier-content" data-drop="25"></div>
+    </div>
+    <div class="tier" data-tier="0">
+      <div class="tier-label">
+        <span>0% LIXO</span>
+        <i class="fas fa-skull" style="color: var(--tier-0);"></i>
+      </div>
+      <div class="tier-content" data-drop="0"></div>
+    </div>
+  </div>
+  
+  <div class="character-pool" id="character-pool">
+    <!-- Personagens serão adicionados aqui via JavaScript -->
+  </div>
+  
+  <!-- Modal para adicionar personagem -->
+  <div class="modal" id="add-character-modal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 class="modal-title">Adicionar Novo Personagem</h3>
+        <button class="close-modal" id="close-modal">&times;</button>
+      </div>
+      <form id="character-form">
+        <div class="form-group">
+          <label for="character-name">Nome do Personagem</label>
+          <input type="text" id="character-name" placeholder="Ex: Homem-Aranha" required>
+        </div>
+        <div class="form-group">
+          <label for="character-img">Foto do Personagem</label>
+          <input type="file" id="character-img" accept="image/*" required>
+        </div>
+        <div class="preview-container">
+          <img id="image-preview" alt="Pré-visualização da imagem">
+        </div>
+        <button type="submit" class="submit-btn">Adicionar Personagem</button>
+      </form>
+    </div>
+  </div>
+  
+  <script>
+    // Dados iniciais dos personagens
+    const characters = [
+      { name: "Stormicide", img: "https://files.fm/thumb_show.php?i=zwngz3ft4b" },
+      { name: "Homem-Trovão", img: "https://files.fm/thumb_show.php?i=abfphs3p5z" },
+      { name: "Homem-Universal", img: "https://files.fm/thumb_show.php?i=dqpwkzcfqj" },
+      { name: "Hiper-Choque", img: "https://files.fm/thumb_show.php?i=dqvaxa497d" },
+      { name: "Stratogata", img: "https://files.fm/thumb_show.php?i=65x4cg5n3g" },
+      { name: "Everseer", img: "https://files.fm/thumb_show.php?i=3xvfmster6" },
+      { name: "Downburst", img: "https://files.fm/thumb_show.php?i=5hwsb3s6gc" },
+      { name: "Macroburst", img: "https://files.fm/thumb_show.php?i=kt4tev82ye" },
+      { name: "Phylange", img: "https://files.fm/thumb_show.php?i=jgyzr35gcy" },
+      { name: "Blazestone", img: "https://files.fm/thumb_show.php?i=q5k6j3z97y" },
+      { name: "Apogee", img: "https://files.fm/thumb_show.php?i=gvff2n7zhy" },
+      { name: "Raio de plasma", img: "https://files.fm/thumb_show.php?i=gekhuaawdt" },
+      { name: "Gamma Jack", img: "https://files.fm/thumb_show.php?i=cx98qnume2" },
+      { name: "Slashdown", img: "https://files.fm/thumb_show.php?i=qu2du34c54" },
+      { name: "Dinamite", img: "https://files.fm/thumb_show.php?i=pz9nuj69as" },
+      { name: "Metaman", img: "https://files.fm/thumb_show.php?i=fvyhnyb5pk" },
+      { name: "Sindrome", img: "https://files.fm/thumb_show.php?i=6m3hrx9jvc" },
+      { name: "Elastic Girl", img: "https://files.fm/thumb_show.php?i=rtr7t5qy8f" },
+      { name: "Dash", img: "https://files.fm/thumb_show.php?i=6sejc23vrh" },
+      { name: "Gelado", img: "https://files.fm/thumb_show.php?i=6egfn2qkf4" },
+      { name: "Escavador", img: "https://files.fm/thumb_show.php?i=fjkceza7pw" },
+      { name: "Violeta", img: "https://files.fm/thumb_show.php?i=v5wf5zfq6g" },
+      { name: "Void", img: "https://files.fm/thumb_show.php?i=m7p5rfuyp4" },
+      { name: "Gazer Beam", img: "https://files.fm/thumb_show.php?i=86myz6uxsd" }
+    ];
 
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-        import { 
-            getDatabase, 
-            ref, 
-            push, 
-            onChildAdded, 
-            onChildRemoved,
-            set,
-            onValue,
-            off
-        } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
-        import { 
-            getAuth, 
-            createUserWithEmailAndPassword, 
-            signInWithEmailAndPassword, 
-            signOut,
-            onAuthStateChanged
-        } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js";
-        import { 
-            getStorage, 
-            ref as storageRef, 
-            uploadBytes, 
-            getDownloadURL 
-        } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-storage.js";
+    // Elementos DOM
+    const pool = document.getElementById('character-pool');
+    const modal = document.getElementById('add-character-modal');
+    const closeModalBtn = document.getElementById('close-modal');
+    const addCharacterBtn = document.getElementById('add-character-btn');
+    const characterForm = document.getElementById('character-form');
+    const characterImgInput = document.getElementById('character-img');
+    const imagePreview = document.getElementById('image-preview');
+    const resetBtn = document.getElementById('reset-btn');
 
-        // Configuração do Firebase
-        const firebaseConfig = {
-            apiKey: "AIzaSyDKmGLarATz78OSOp0e2IDNOPubW7B0xNE",
-            authDomain: "edutouca-edfc2.firebaseapp.com",
-            databaseURL: "https://edutouca-edfc2-default-rtdb.firebaseio.com",
-            projectId: "edutouca-edfc2",
-            storageBucket: "edutouca-edfc2.appspot.com",
-            messagingSenderId: "6769105138",
-            appId: "1:6769105138:web:484c92245104ec4652986b",
+    // Estado da aplicação
+    let dragged = null;
+    let currentCharacter = null;
+    let customCharacters = JSON.parse(localStorage.getItem('customCharacters')) || [];
+    let isDragging = false;
+
+    // Inicializar a tierlist
+    function initTierlist() {
+      renderCharacters();
+      
+      // Event listeners para modais
+      addCharacterBtn.addEventListener('click', () => {
+        modal.classList.add('active');
+      });
+      
+      closeModalBtn.addEventListener('click', () => {
+        modal.classList.remove('active');
+        characterForm.reset();
+        imagePreview.style.display = 'none';
+      });
+      
+      // Preview da imagem
+      characterImgInput.addEventListener('change', function(e) {
+        if (this.files && this.files[0]) {
+          const reader = new FileReader();
+          
+          reader.onload = function(e) {
+            imagePreview.src = e.target.result;
+            imagePreview.style.display = 'block';
+          }
+          
+          reader.readAsDataURL(this.files[0]);
+        }
+      });
+      
+      // Adicionar novo personagem
+      characterForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        
+        const name = document.getElementById('character-name').value;
+        const file = characterImgInput.files[0];
+        
+        if (!name || !file) return;
+        
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const newCharacter = {
+            name: name,
+            img: e.target.result,
+            custom: true
+          };
+          
+          customCharacters.push(newCharacter);
+          localStorage.setItem('customCharacters', JSON.stringify(customCharacters));
+          
+          createCharacterElement(newCharacter, true);
+          
+          modal.classList.remove('active');
+          characterForm.reset();
+          imagePreview.style.display = 'none';
         };
-
-        // Inicializa o Firebase
-        const app = initializeApp(firebaseConfig);
-        const db = getDatabase(app);
-        const auth = getAuth(app);
-        const storage = getStorage(app);
-
-        // Referências do Firebase
-        const messagesRef = ref(db, "messages");
-        const usersRef = ref(db, "users");
-        const onlineUsersRef = ref(db, "onlineUsers");
-
-        // Elementos do DOM
-        const loginBtn = document.getElementById('loginBtn');
-        const registerBtn = document.getElementById('registerBtn');
-        const logoutBtn = document.getElementById('logoutBtn');
-        const authButtons = document.getElementById('authButtons');
-        const userProfile = document.getElementById('userProfile');
-        const loginModal = document.getElementById('loginModal');
-        const registerModal = document.getElementById('registerModal');
-        const closeLoginModal = document.getElementById('closeLoginModal');
-        const closeRegisterModal = document.getElementById('closeRegisterModal');
-        const showRegisterForm = document.getElementById('showRegisterForm');
-        const showLoginForm = document.getElementById('showLoginForm');
-        const loginForm = document.getElementById('loginForm');
-        const registerForm = document.getElementById('registerForm');
-        const messageInput = document.getElementById('messageInput');
-        const sendButton = document.getElementById('sendButton');
-        const chatMessages = document.getElementById('chatMessages');
-        const onlineUsers = document.getElementById('onlineUsers');
-        const avatarInput = document.getElementById('avatarInput');
-        const avatarPreview = document.getElementById('avatarPreview');
-        const uploadBtn = document.getElementById('uploadBtn');
-
-        // Variáveis globais
-        let currentUser = null;
-        let userAvatarUrl = '';
-        let messageCount = 0;
-        const MAX_MESSAGES = 100;
-
-        // Event Listeners
-        loginBtn.addEventListener('click', () => loginModal.style.display = 'flex');
-        registerBtn.addEventListener('click', () => registerModal.style.display = 'flex');
-        logoutBtn.addEventListener('click', signOutUser);
-        closeLoginModal.addEventListener('click', () => loginModal.style.display = 'none');
-        closeRegisterModal.addEventListener('click', () => registerModal.style.display = 'none');
-        showRegisterForm.addEventListener('click', (e) => {
-            e.preventDefault();
-            loginModal.style.display = 'none';
-            registerModal.style.display = 'flex';
-        });
-        showLoginForm.addEventListener('click', (e) => {
-            e.preventDefault();
-            registerModal.style.display = 'none';
-            loginModal.style.display = 'flex';
-        });
-        uploadBtn.addEventListener('click', () => avatarInput.click());
-        avatarInput.addEventListener('change', handleAvatarUpload);
-        sendButton.addEventListener('click', sendMessage);
-        messageInput.addEventListener('keypress', (e) => {
-            if (e.key === 'Enter') sendMessage();
-        });
-
-        // Formulário de Login
-        loginForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const email = document.getElementById('loginEmail').value;
-            const password = document.getElementById('loginPassword').value;
-            
-            signInWithEmailAndPassword(auth, email, password)
-                .then((userCredential) => {
-                    // Login bem-sucedido
-                    currentUser = userCredential.user;
-                    loginModal.style.display = 'none';
-                    updateUI();
-                    listenToUserData(currentUser.uid);
-                    setUserOnline(currentUser.uid);
-                })
-                .catch((error) => {
-                    // Tratamento de erros
-                    const errorCode = error.code;
-                    const errorMessage = error.message;
-                    
-                    if (errorCode === 'auth/user-not-found') {
-                        document.getElementById('loginEmailError').style.display = 'block';
-                        document.getElementById('loginPasswordError').style.display = 'none';
-                    } else if (errorCode === 'auth/wrong-password') {
-                        document.getElementById('loginPasswordError').style.display = 'block';
-                        document.getElementById('loginEmailError').style.display = 'none';
-                    }
-                });
-        });
-
-        // Formulário de Cadastro
-        registerForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            const name = document.getElementById('registerName').value;
-            const email = document.getElementById('registerEmail').value;
-            const password = document.getElementById('registerPassword').value;
-            const confirmPassword = document.getElementById('registerConfirmPassword').value;
-            
-            // Validação de senha
-            if (password !== confirmPassword) {
-                document.getElementById('registerPasswordError').style.display = 'block';
-                return;
-            } else {
-                document.getElementById('registerPasswordError').style.display = 'none';
-            }
-            
-            createUserWithEmailAndPassword(auth, email, password)
-                .then((userCredential) => {
-                    // Cadastro bem-sucedido
-                    currentUser = userCredential.user;
-                    
-                    // Upload da foto de perfil se existir
-                    const avatarFile = avatarInput.files[0];
-                    if (avatarFile) {
-                        const avatarRef = storageRef(storage, `avatars/${currentUser.uid}`);
-                        return uploadBytes(avatarRef, avatarFile)
-                            .then(() => getDownloadURL(avatarRef))
-                            .then((url) => {
-                                userAvatarUrl = url;
-                                return saveUserData(currentUser.uid, name, email, url);
-                            });
-                    } else {
-                        // Usar avatar padrão
-                        userAvatarUrl = `https://ui-avatars.com/api/?name=${encodeURIComponent(name)}&background=172a45&color=64ffda`;
-                        return saveUserData(currentUser.uid, name, email, userAvatarUrl);
-                    }
-                })
-                .then(() => {
-                    registerModal.style.display = 'none';
-                    updateUI();
-                    setUserOnline(currentUser.uid);
-                })
-                .catch((error) => {
-                    const errorCode = error.code;
-                    const errorMessage = error.message;
-                    
-                    if (errorCode === 'auth/email-already-in-use') {
-                        document.getElementById('registerEmailError').style.display = 'block';
-                    }
-                });
-        });
-
-        // Funções
-        function handleAvatarUpload(e) {
-            const file = e.target.files[0];
-            if (file) {
-                const reader = new FileReader();
-                reader.onload = (event) => {
-                    avatarPreview.src = event.target.result;
-                };
-                reader.readAsDataURL(file);
-            }
+        
+        reader.readAsDataURL(file);
+      });
+      
+      // Resetar tierlist
+      resetBtn.addEventListener('click', function() {
+        if (confirm('Tem certeza que deseja resetar a tierlist? Todos os personagens voltarão para o pool.')) {
+          document.querySelectorAll('.tier-content').forEach(tier => {
+            tier.innerHTML = '';
+          });
+          
+          renderCharacters();
         }
-
-        function saveUserData(userId, name, email, avatarUrl) {
-            return set(ref(db, `users/${userId}`), {
-                name: name,
-                email: email,
-                avatar: avatarUrl,
-                createdAt: new Date().toISOString()
+      });
+    }
+    
+    // Renderizar todos os personagens
+    function renderCharacters() {
+      pool.innerHTML = '';
+      
+      // Adicionar personagens padrão
+      characters.forEach(c => createCharacterElement(c));
+      
+      // Adicionar personagens customizados
+      customCharacters.forEach(c => createCharacterElement(c, true));
+      
+      // Adicionar mensagem se não houver personagens
+      if (characters.length + customCharacters.length === 0) {
+        pool.innerHTML = '<div class="empty-message">Adicione personagens usando o botão acima</div>';
+      }
+    }
+    
+    // Criar elemento de personagem
+    function createCharacterElement(character, isCustom = false) {
+      const wrapper = document.createElement('div');
+      wrapper.className = 'character-container';
+      wrapper.dataset.name = character.name;
+      
+      const img = document.createElement('img');
+      img.src = character.img;
+      img.className = 'character';
+      img.alt = character.name;
+      img.draggable = false;
+      
+      const label = document.createElement('div');
+      label.className = 'character-name';
+      label.textContent = character.name;
+      
+      // Botão de deletar para personagens customizados
+      if (isCustom) {
+        const deleteBtn = document.createElement('button');
+        deleteBtn.className = 'delete-btn';
+        deleteBtn.innerHTML = '<i class="fas fa-trash"></i>';
+        deleteBtn.title = 'Remover personagem';
+        
+        deleteBtn.addEventListener('click', function(e) {
+          e.stopPropagation();
+          if (confirm(`Remover ${character.name} permanentemente?`)) {
+            // Remover do array de customCharacters
+            customCharacters = customCharacters.filter(c => c.img !== character.img);
+            localStorage.setItem('customCharacters', JSON.stringify(customCharacters));
+            
+            // Remover do DOM
+            wrapper.remove();
+            
+            // Remover de qualquer tier
+            document.querySelectorAll('.tier-content').forEach(tier => {
+              const charInTier = tier.querySelector(`.character-container[data-name="${character.name}"]`);
+              if (charInTier) charInTier.remove();
             });
-        }
-
-        function listenToUserData(userId) {
-            const userRef = ref(db, `users/${userId}`);
-            onValue(userRef, (snapshot) => {
-                const userData = snapshot.val();
-                if (userData) {
-                    userAvatarUrl = userData.avatar;
-                    document.querySelector('.logo img').src = userAvatarUrl;
-                }
-            });
-        }
-
-        function setUserOnline(userId) {
-            const userOnlineRef = ref(db, `onlineUsers/${userId}`);
-            set(userOnlineRef, true);
-            
-            // Quando o usuário sair, remover da lista de online
-            onAuthStateChanged(auth, (user) => {
-                if (!user) {
-                    set(userOnlineRef, null);
-                }
-            });
-        }
-
-        function signOutUser() {
-            signOut(auth).then(() => {
-                currentUser = null;
-                updateUI();
-            }).catch((error) => {
-                console.error('Erro ao sair:', error);
-            });
-        }
-
-        function updateUI() {
-            if (currentUser) {
-                authButtons.style.display = 'none';
-                userProfile.style.display = 'block';
-                messageInput.disabled = false;
-                sendButton.disabled = false;
-            } else {
-                authButtons.style.display = 'flex';
-                userProfile.style.display = 'none';
-                messageInput.disabled = true;
-                sendButton.disabled = true;
-            }
-        }
-
-        function sendMessage() {
-            const messageText = messageInput.value.trim();
-            if (!messageText || !currentUser) return;
-            
-            const newMessage = {
-                text: messageText,
-                userId: currentUser.uid,
-                name: currentUser.displayName || 'Anônimo',
-                avatar: userAvatarUrl,
-                timestamp: new Date().getTime()
-            };
-            
-            push(messagesRef, newMessage)
-                .then(() => {
-                    messageInput.value = '';
-                })
-                .catch((error) => {
-                    console.error('Erro ao enviar mensagem:', error);
-                });
-        }
-
-        function displayMessage(messageData) {
-            // Limitar o número de mensagens exibidas
-            messageCount++;
-            if (messageCount > MAX_MESSAGES) {
-                const messages = chatMessages.children;
-                if (messages.length > MAX_MESSAGES) {
-                    chatMessages.removeChild(messages[messages.length - 1]);
-                }
-            }
-            
-            const isCurrentUser = currentUser && messageData.userId === currentUser.uid;
-            const messageElement = document.createElement('div');
-            messageElement.className = `message ${isCurrentUser ? 'user' : ''}`;
-            
-            const time = new Date(messageData.timestamp);
-            const timeString = time.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-            
-            messageElement.innerHTML = `
-                <div class="message-info">
-                    <img src="${messageData.avatar}" alt="${messageData.name}" class="user-avatar">
-                    <span class="user-name">${messageData.name}</span>
-                    <span class="message-time">${timeString}</span>
-                </div>
-                <div class="message-text">${messageData.text}</div>
-            `;
-            
-            // Adiciona no início (como estamos usando column-reverse, parece que adiciona no final)
-            chatMessages.insertBefore(messageElement, chatMessages.firstChild);
-            
-            // Animação de scroll suave para novas mensagens
-            if (isCurrentUser) {
-                setTimeout(() => {
-                    chatMessages.scrollTo({ top: 0, behavior: 'smooth' });
-                }, 100);
-            }
-        }
-
-        function displayOnlineUser(userId, userData) {
-            const userElement = document.createElement('div');
-            userElement.className = 'online-user';
-            userElement.innerHTML = `
-                <img src="${userData.avatar}" alt="${userData.name}" class="online-user-avatar">
-                <span>${userData.name}</span>
-            `;
-            userElement.id = `user-${userId}`;
-            
-            const existingUser = document.getElementById(`user-${userId}`);
-            if (existingUser) {
-                onlineUsers.replaceChild(userElement, existingUser);
-            } else {
-                onlineUsers.appendChild(userElement);
-            }
-        }
-
-        function removeOnlineUser(userId) {
-            const userElement = document.getElementById(`user-${userId}`);
-            if (userElement) {
-                onlineUsers.removeChild(userElement);
-            }
-        }
-
-        // Ouvintes do Firebase
-        onChildAdded(messagesRef, (snapshot) => {
-            const messageData = snapshot.val();
-            displayMessage(messageData);
+          }
         });
-
-        // Ouvinte para usuários online
-        onChildAdded(onlineUsersRef, (snapshot) => {
-            const userId = snapshot.key;
-            const userRef = ref(db, `users/${userId}`);
-            
-            onValue(userRef, (userSnapshot) => {
-                const userData = userSnapshot.val();
-                if (userData) {
-                    displayOnlineUser(userId, userData);
-                }
-            });
-        });
-
-        onChildRemoved(onlineUsersRef, (snapshot) => {
-            const userId = snapshot.key;
-            removeOnlineUser(userId);
-        });
-
-        // Verifica estado de autenticação ao carregar a página
-        onAuthStateChanged(auth, (user) => {
-            if (user) {
-                currentUser = user;
-                updateUI();
-                listenToUserData(user.uid);
-                setUserOnline(user.uid);
-            } else {
-                currentUser = null;
-                updateUI();
-            }
-        });
-
-        // Fechar modais ao clicar fora
-        window.addEventListener('click', (e) => {
-            if (e.target === loginModal) loginModal.style.display = 'none';
-            if (e.target === registerModal) registerModal.style.display = 'none';
-        });
-    </script>
+        
+        wrapper.appendChild(deleteBtn);
+      }
+      
+      // Adicionar funcionalidade de arrastar
+      setupDragEvents(wrapper, img);
+      
+      wrapper.appendChild(img);
+      wrapper.appendChild(label);
+      pool.appendChild(wrapper);
+    }
+    
+    // Configurar eventos de arrastar (mouse e touch)
+    function setupDragEvents(wrapper, img) {
+      // Eventos de mouse
+      img.addEventListener('mousedown', startDrag);
+      wrapper.addEventListener('mousedown', startDrag);
+      
+      // Eventos de touch
+      img.addEventListener('touchstart', startDragTouch, { passive: false });
+      wrapper.addEventListener('touchstart', startDragTouch, { passive: false });
+    }
+    
+    // Iniciar arrasto com mouse
+    function startDrag(e) {
+      if (e.button !== 0 || isDragging) return; // Apenas botão esquerdo e evitar múltiplos arrastos
+      e.preventDefault();
+      
+      currentCharacter = this.closest('.character-container');
+      if (!currentCharacter) return;
+      
+      isDragging = true;
+      createDragElement(currentCharacter.cloneNode(true), e.clientX, e.clientY);
+      
+      document.addEventListener('mousemove', dragElement);
+      document.addEventListener('mouseup', endDrag);
+      document.addEventListener('mouseleave', endDrag);
+    }
+    
+    // Iniciar arrasto com touch
+    function startDragTouch(e) {
+      if (isDragging) return;
+      e.preventDefault();
+      
+      currentCharacter = this.closest('.character-container');
+      if (!currentCharacter) return;
+      
+      const touch = e.touches[0];
+      isDragging = true;
+      createDragElement(currentCharacter.cloneNode(true), touch.clientX, touch.clientY);
+      
+      document.addEventListener('touchmove', dragElementTouch, { passive: false });
+      document.addEventListener('touchend', endDrag);
+    }
+    
+    // Criar elemento de arrasto
+    function createDragElement(clone, x, y) {
+      dragged = clone;
+      dragged.style.position = 'fixed'; // Usando fixed para evitar problemas de posicionamento
+      dragged.style.left = (x - 50) + 'px';
+      dragged.style.top = (y - 50) + 'px';
+      dragged.style.zIndex = '9999';
+      dragged.style.pointerEvents = 'none';
+      dragged.querySelector('img').classList.add('dragging');
+      
+      document.body.appendChild(dragged);
+    }
+    
+    // Arrastar elemento com mouse
+    function dragElement(e) {
+      if (!dragged) return;
+      
+      dragged.style.left = (e.clientX - 50) + 'px';
+      dragged.style.top = (e.clientY - 50) + 'px';
+      
+      highlightDropTargets(e.clientX, e.clientY);
+    }
+    
+    // Arrastar elemento com touch
+    function dragElementTouch(e) {
+      if (!dragged) return;
+      const touch = e.touches[0];
+      
+      dragged.style.left = (touch.clientX - 50) + 'px';
+      dragged.style.top = (touch.clientY - 50) + 'px';
+      
+      highlightDropTargets(touch.clientX, touch.clientY);
+    }
+    
+    // Destacar áreas de drop possíveis
+    function highlightDropTargets(x, y) {
+      document.querySelectorAll('[data-drop]').forEach(drop => {
+        const rect = drop.getBoundingClientRect();
+        if (x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom) {
+          drop.classList.add('drop-target');
+        } else {
+          drop.classList.remove('drop-target');
+        }
+      });
+    }
+    
+    // Finalizar o arrasto (comum para mouse e touch)
+    function endDrag(e) {
+      if (!dragged || !isDragging) return;
+      
+      let clientX, clientY;
+      
+      if (e.type === 'touchend') {
+        if (e.changedTouches && e.changedTouches[0]) {
+          clientX = e.changedTouches[0].clientX;
+          clientY = e.changedTouches[0].clientY;
+        }
+      } else {
+        clientX = e.clientX;
+        clientY = e.clientY;
+      }
+      
+      // Verificar se soltou em uma área de drop válida
+      let dropped = false;
+      document.querySelectorAll('[data-drop]').forEach(drop => {
+        const rect = drop.getBoundingClientRect();
+        if (clientX >= rect.left && clientX <= rect.right && 
+            clientY >= rect.top && clientY <= rect.bottom) {
+          
+          // Remover a instância anterior se existir
+          const existing = drop.querySelector(`.character-container[data-name="${currentCharacter.dataset.name}"]`);
+          if (existing) existing.remove();
+          
+          // Adicionar novo elemento
+          const newWrapper = currentCharacter.cloneNode(true);
+          setupDragEvents(newWrapper, newWrapper.querySelector('img'));
+          drop.appendChild(newWrapper);
+          dropped = true;
+          
+          // Animação de entrada
+          newWrapper.style.opacity = '0';
+          newWrapper.style.transform = 'scale(0.8)';
+          setTimeout(() => {
+            newWrapper.style.transition = 'opacity 0.3s, transform 0.3s';
+            newWrapper.style.opacity = '1';
+            newWrapper.style.transform = 'scale(1)';
+          }, 10);
+        }
+        
+        drop.classList.remove('drop-target');
+      });
+      
+      // Remover do pool se foi movido para uma tier
+      if (dropped && pool.contains(currentCharacter)) {
+        currentCharacter.remove();
+      }
+      
+      // Limpar estado de arrasto
+      cleanupDrag();
+    }
+    
+    // Limpar estado de arrasto
+    function cleanupDrag() {
+      // Remover todos os event listeners
+      document.removeEventListener('mousemove', dragElement);
+      document.removeEventListener('touchmove', dragElementTouch);
+      document.removeEventListener('mouseup', endDrag);
+      document.removeEventListener('touchend', endDrag);
+      document.removeEventListener('mouseleave', endDrag);
+      
+      // Remover elemento arrastado
+      if (dragged) {
+        dragged.remove();
+        dragged = null;
+      }
+      
+      // Resetar estado
+      currentCharacter = null;
+      isDragging = false;
+      
+      // Remover highlights
+      document.querySelectorAll('.drop-target').forEach(el => {
+        el.classList.remove('drop-target');
+      });
+    }
+    
+    // Iniciar a aplicação
+    initTierlist();
+  </script>
 </body>
 </html>
