@@ -28,21 +28,34 @@
       color: var(--text);
       overflow-x: hidden;
       min-height: 100vh;
-      touch-action: none; /* Importante para evitar conflitos com touch */
+      touch-action: none;
+    }
+    .main-container {
+      max-width: 1000px;
+      margin: 0 auto;
+      height: calc(100vh - 120px);
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
     }
     h1 {
       text-align: center;
       color: white;
-      margin-bottom: 30px;
+      margin-bottom: 20px;
       font-size: 2rem;
       display: flex;
       align-items: center;
       justify-content: center;
       gap: 15px;
+      flex-shrink: 0;
+    }
+    .tier-list-container {
+      flex-grow: 1;
+      overflow-y: auto;
+      scroll-behavior: smooth;
+      padding-bottom: 20px;
     }
     .tier-container {
-      max-width: 1000px;
-      margin: 20px auto;
       display: flex;
       flex-direction: column;
       gap: 15px;
@@ -57,7 +70,6 @@
       gap: 10px;
       transition: all 0.3s ease;
       position: relative;
-      overflow-x: auto;
     }
     .tier[data-tier="100"] { border-color: var(--tier-100); }
     .tier[data-tier="75"] { border-color: var(--tier-75); }
@@ -74,8 +86,7 @@
     }
     .tier-content {
       display: flex;
-      flex-wrap: nowrap;
-      overflow-x: auto;
+      flex-wrap: wrap;
       gap: 15px;
       min-height: 120px;
       background: rgba(255,255,255,0.05);
@@ -111,7 +122,7 @@
       transform: scale(1.2);
       opacity: 0.8;
       z-index: 1000;
-      position: fixed; /* Alterado para fixed para evitar problemas de posicionamento */
+      position: fixed;
       pointer-events: none;
       box-shadow: 0 8px 16px rgba(0,0,0,0.7);
       animation: pulse 0.8s infinite alternate;
@@ -129,13 +140,11 @@
       text-overflow: ellipsis;
     }
     .character-pool {
-      max-width: 1000px;
-      margin: 40px auto 0 auto;
       display: flex;
       flex-wrap: wrap;
       gap: 15px;
-      padding-bottom: 10px;
-      justify-content: center;
+      padding: 15px 0;
+      min-height: 150px;
     }
     .delete-btn {
       position: absolute;
@@ -164,11 +173,11 @@
       background: #ff1a1a;
     }
     .controls {
-      max-width: 1000px;
-      margin: 20px auto;
       display: flex;
       justify-content: center;
       gap: 15px;
+      margin-bottom: 20px;
+      flex-shrink: 0;
     }
     .btn {
       background: var(--accent);
@@ -290,10 +299,34 @@
       width: 100%;
       padding: 20px;
     }
+    .drop-target {
+      animation: highlight 0.5s;
+    }
+    @keyframes highlight {
+      0% { background: rgba(77, 121, 255, 0.1); }
+      100% { background: rgba(255,255,255,0.05); }
+    }
+    .scroll-indicator {
+      position: fixed;
+      width: 100%;
+      height: 60px;
+      z-index: 999;
+      pointer-events: none;
+      opacity: 0;
+      transition: opacity 0.3s;
+    }
+    .scroll-indicator.top {
+      top: 0;
+      background: linear-gradient(to bottom, rgba(0,0,0,0.7), transparent);
+    }
+    .scroll-indicator.bottom {
+      bottom: 0;
+      background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
+    }
+    .scroll-indicator.active {
+      opacity: 1;
+    }
     @media (max-width: 768px) {
-      .tier-content {
-        min-height: 100px;
-      }
       .character, .character-container {
         width: 80px;
         height: 80px;
@@ -302,67 +335,67 @@
         font-size: 0.7rem;
       }
     }
-    .drop-target {
-      animation: highlight 0.5s;
-    }
-    @keyframes highlight {
-      0% { background: rgba(77, 121, 255, 0.1); }
-      100% { background: rgba(255,255,255,0.05); }
-    }
   </style>
 </head>
 <body>
-  <h1><i class="fas fa-layer-group"></i> Tierlist Supers</h1>
-  
-  <div class="controls">
-    <button class="btn" id="add-character-btn">
-      <i class="fas fa-plus-circle"></i> Adicionar Personagem
-    </button>
-    <button class="btn" id="reset-btn">
-      <i class="fas fa-redo-alt"></i> Resetar Tierlist
-    </button>
-  </div>
-  
-  <div class="tier-container">
-    <div class="tier" data-tier="100">
-      <div class="tier-label">
-        <span>100% TOP TIER</span>
-        <i class="fas fa-crown" style="color: var(--tier-100);"></i>
-      </div>
-      <div class="tier-content" data-drop="100"></div>
+  <div class="scroll-indicator top"></div>
+  <div class="scroll-indicator bottom"></div>
+
+  <div class="main-container">
+    <h1><i class="fas fa-layer-group"></i> Tierlist Supers</h1>
+    
+    <div class="controls">
+      <button class="btn" id="add-character-btn">
+        <i class="fas fa-plus-circle"></i> Adicionar Personagem
+      </button>
+      <button class="btn" id="reset-btn">
+        <i class="fas fa-redo-alt"></i> Resetar Tierlist
+      </button>
     </div>
-    <div class="tier" data-tier="75">
-      <div class="tier-label">
-        <span>75% EXCELENTE</span>
-        <i class="fas fa-star" style="color: var(--tier-75);"></i>
+    
+    <div class="tier-list-container">
+      <div class="tier-container">
+        <div class="tier" data-tier="100">
+          <div class="tier-label">
+            <span>100% TOP TIER</span>
+            <i class="fas fa-crown" style="color: var(--tier-100);"></i>
+          </div>
+          <div class="tier-content" data-drop="100"></div>
+        </div>
+        <div class="tier" data-tier="75">
+          <div class="tier-label">
+            <span>75% EXCELENTE</span>
+            <i class="fas fa-star" style="color: var(--tier-75);"></i>
+          </div>
+          <div class="tier-content" data-drop="75"></div>
+        </div>
+        <div class="tier" data-tier="50">
+          <div class="tier-label">
+            <span>50% MÉDIO</span>
+            <i class="fas fa-exchange-alt" style="color: var(--tier-50);"></i>
+          </div>
+          <div class="tier-content" data-drop="50"></div>
+        </div>
+        <div class="tier" data-tier="25">
+          <div class="tier-label">
+            <span>25% FRACO</span>
+            <i class="fas fa-exclamation-triangle" style="color: var(--tier-25);"></i>
+          </div>
+          <div class="tier-content" data-drop="25"></div>
+        </div>
+        <div class="tier" data-tier="0">
+          <div class="tier-label">
+            <span>0% LIXO</span>
+            <i class="fas fa-skull" style="color: var(--tier-0);"></i>
+          </div>
+          <div class="tier-content" data-drop="0"></div>
+        </div>
       </div>
-      <div class="tier-content" data-drop="75"></div>
-    </div>
-    <div class="tier" data-tier="50">
-      <div class="tier-label">
-        <span>50% MÉDIO</span>
-        <i class="fas fa-exchange-alt" style="color: var(--tier-50);"></i>
+      
+      <div class="character-pool" id="character-pool">
+        <!-- Personagens serão adicionados aqui via JavaScript -->
       </div>
-      <div class="tier-content" data-drop="50"></div>
     </div>
-    <div class="tier" data-tier="25">
-      <div class="tier-label">
-        <span>25% FRACO</span>
-        <i class="fas fa-exclamation-triangle" style="color: var(--tier-25);"></i>
-      </div>
-      <div class="tier-content" data-drop="25"></div>
-    </div>
-    <div class="tier" data-tier="0">
-      <div class="tier-label">
-        <span>0% LIXO</span>
-        <i class="fas fa-skull" style="color: var(--tier-0);"></i>
-      </div>
-      <div class="tier-content" data-drop="0"></div>
-    </div>
-  </div>
-  
-  <div class="character-pool" id="character-pool">
-    <!-- Personagens serão adicionados aqui via JavaScript -->
   </div>
   
   <!-- Modal para adicionar personagem -->
@@ -390,7 +423,7 @@
   </div>
   
   <script>
-    // Dados iniciais dos personagens
+    // Dados iniciais dos personagens (apenas com fotos válidas)
     const characters = [
       { name: "Stormicide", img: "https://files.fm/thumb_show.php?i=zwngz3ft4b" },
       { name: "Homem-Trovão", img: "https://files.fm/thumb_show.php?i=abfphs3p5z" },
@@ -427,12 +460,20 @@
     const characterImgInput = document.getElementById('character-img');
     const imagePreview = document.getElementById('image-preview');
     const resetBtn = document.getElementById('reset-btn');
+    const scrollTopIndicator = document.querySelector('.scroll-indicator.top');
+    const scrollBottomIndicator = document.querySelector('.scroll-indicator.bottom');
+    const tierListContainer = document.querySelector('.tier-list-container');
 
     // Estado da aplicação
     let dragged = null;
     let currentCharacter = null;
     let customCharacters = JSON.parse(localStorage.getItem('customCharacters')) || [];
     let isDragging = false;
+    let scrollInterval = null;
+    let lastScrollTime = 0;
+    const scrollSpeed = 20;
+    const scrollZoneHeight = 100;
+    const characterRegistry = new Set(); // Para controlar personagens únicos
 
     // Inicializar a tierlist
     function initTierlist() {
@@ -467,10 +508,16 @@
       characterForm.addEventListener('submit', function(e) {
         e.preventDefault();
         
-        const name = document.getElementById('character-name').value;
+        const name = document.getElementById('character-name').value.trim();
         const file = characterImgInput.files[0];
         
         if (!name || !file) return;
+        
+        // Verificar se personagem já existe
+        if (characterRegistry.has(name.toLowerCase())) {
+          alert(`Personagem "${name}" já existe!`);
+          return;
+        }
         
         const reader = new FileReader();
         reader.onload = function(e) {
@@ -482,6 +529,7 @@
           
           customCharacters.push(newCharacter);
           localStorage.setItem('customCharacters', JSON.stringify(customCharacters));
+          characterRegistry.add(name.toLowerCase());
           
           createCharacterElement(newCharacter, true);
           
@@ -508,15 +556,46 @@
     // Renderizar todos os personagens
     function renderCharacters() {
       pool.innerHTML = '';
+      characterRegistry.clear();
       
-      // Adicionar personagens padrão
-      characters.forEach(c => createCharacterElement(c));
+      // Adicionar personagens padrão (apenas se não estiverem em nenhuma tier)
+      characters.forEach(c => {
+        if (!characterRegistry.has(c.name.toLowerCase())) {
+          // Verificar se o personagem já está em alguma tier
+          let isInTier = false;
+          document.querySelectorAll('.tier-content').forEach(tier => {
+            if (tier.querySelector(`.character-container[data-name="${c.name}"]`)) {
+              isInTier = true;
+            }
+          });
+          
+          if (!isInTier) {
+            createCharacterElement(c);
+            characterRegistry.add(c.name.toLowerCase());
+          }
+        }
+      });
       
-      // Adicionar personagens customizados
-      customCharacters.forEach(c => createCharacterElement(c, true));
+      // Adicionar personagens customizados (apenas se não estiverem em nenhuma tier)
+      customCharacters.forEach(c => {
+        if (!characterRegistry.has(c.name.toLowerCase())) {
+          // Verificar se o personagem já está em alguma tier
+          let isInTier = false;
+          document.querySelectorAll('.tier-content').forEach(tier => {
+            if (tier.querySelector(`.character-container[data-name="${c.name}"]`)) {
+              isInTier = true;
+            }
+          });
+          
+          if (!isInTier) {
+            createCharacterElement(c, true);
+            characterRegistry.add(c.name.toLowerCase());
+          }
+        }
+      });
       
       // Adicionar mensagem se não houver personagens
-      if (characters.length + customCharacters.length === 0) {
+      if (pool.children.length === 0) {
         pool.innerHTML = '<div class="empty-message">Adicione personagens usando o botão acima</div>';
       }
     }
@@ -550,6 +629,7 @@
             // Remover do array de customCharacters
             customCharacters = customCharacters.filter(c => c.img !== character.img);
             localStorage.setItem('customCharacters', JSON.stringify(customCharacters));
+            characterRegistry.delete(character.name.toLowerCase());
             
             // Remover do DOM
             wrapper.remove();
@@ -586,7 +666,7 @@
     
     // Iniciar arrasto com mouse
     function startDrag(e) {
-      if (e.button !== 0 || isDragging) return; // Apenas botão esquerdo e evitar múltiplos arrastos
+      if (e.button !== 0 || isDragging) return;
       e.preventDefault();
       
       currentCharacter = this.closest('.character-container');
@@ -595,9 +675,15 @@
       isDragging = true;
       createDragElement(currentCharacter.cloneNode(true), e.clientX, e.clientY);
       
+      // Esconder o personagem original enquanto estiver sendo arrastado
+      currentCharacter.style.visibility = 'hidden';
+      
       document.addEventListener('mousemove', dragElement);
       document.addEventListener('mouseup', endDrag);
       document.addEventListener('mouseleave', endDrag);
+      
+      // Iniciar verificação de rolagem
+      startScrollCheck();
     }
     
     // Iniciar arrasto com touch
@@ -612,14 +698,20 @@
       isDragging = true;
       createDragElement(currentCharacter.cloneNode(true), touch.clientX, touch.clientY);
       
+      // Esconder o personagem original enquanto estiver sendo arrastado
+      currentCharacter.style.visibility = 'hidden';
+      
       document.addEventListener('touchmove', dragElementTouch, { passive: false });
       document.addEventListener('touchend', endDrag);
+      
+      // Iniciar verificação de rolagem
+      startScrollCheck();
     }
     
     // Criar elemento de arrasto
     function createDragElement(clone, x, y) {
       dragged = clone;
-      dragged.style.position = 'fixed'; // Usando fixed para evitar problemas de posicionamento
+      dragged.style.position = 'fixed';
       dragged.style.left = (x - 50) + 'px';
       dragged.style.top = (y - 50) + 'px';
       dragged.style.zIndex = '9999';
@@ -637,6 +729,7 @@
       dragged.style.top = (e.clientY - 50) + 'px';
       
       highlightDropTargets(e.clientX, e.clientY);
+      checkScroll(e.clientY);
     }
     
     // Arrastar elemento com touch
@@ -648,6 +741,7 @@
       dragged.style.top = (touch.clientY - 50) + 'px';
       
       highlightDropTargets(touch.clientX, touch.clientY);
+      checkScroll(touch.clientY);
     }
     
     // Destacar áreas de drop possíveis
@@ -662,9 +756,51 @@
       });
     }
     
-    // Finalizar o arrasto (comum para mouse e touch)
+    // Iniciar verificação de rolagem automática
+    function startScrollCheck() {
+      scrollInterval = setInterval(() => {
+        const now = Date.now();
+        if (now - lastScrollTime > 100) {
+          lastScrollTime = now;
+          if (dragged) {
+            const rect = dragged.getBoundingClientRect();
+            checkScroll(rect.top + rect.height / 2);
+          }
+        }
+      }, 16);
+    }
+    
+    // Verificar se precisa rolar a página
+    function checkScroll(y) {
+      const containerRect = tierListContainer.getBoundingClientRect();
+      const containerTop = containerRect.top;
+      const containerBottom = containerRect.bottom;
+      const scrollTop = tierListContainer.scrollTop;
+      const scrollHeight = tierListContainer.scrollHeight;
+      const clientHeight = tierListContainer.clientHeight;
+      
+      // Mostrar indicadores de rolagem
+      scrollTopIndicator.classList.toggle('active', y < containerTop + scrollZoneHeight);
+      scrollBottomIndicator.classList.toggle('active', y > containerBottom - scrollZoneHeight);
+      
+      // Rolar para cima
+      if (y < containerTop + scrollZoneHeight && scrollTop > 0) {
+        tierListContainer.scrollBy(0, -scrollSpeed);
+      } 
+      // Rolar para baixo
+      else if (y > containerBottom - scrollZoneHeight && scrollTop < scrollHeight - clientHeight) {
+        tierListContainer.scrollBy(0, scrollSpeed);
+      }
+    }
+    
+    // Finalizar o arrasto
     function endDrag(e) {
       if (!dragged || !isDragging) return;
+      
+      // Mostrar o personagem original novamente
+      if (currentCharacter) {
+        currentCharacter.style.visibility = 'visible';
+      }
       
       let clientX, clientY;
       
@@ -685,15 +821,28 @@
         if (clientX >= rect.left && clientX <= rect.right && 
             clientY >= rect.top && clientY <= rect.bottom) {
           
-          // Remover a instância anterior se existir
+          // Verificar se já existe na tier de destino
           const existing = drop.querySelector(`.character-container[data-name="${currentCharacter.dataset.name}"]`);
-          if (existing) existing.remove();
+          if (existing) return;
+          
+          // Remover de qualquer outra tier
+          document.querySelectorAll('.tier-content').forEach(tier => {
+            const charInTier = tier.querySelector(`.character-container[data-name="${currentCharacter.dataset.name}"]`);
+            if (charInTier && charInTier !== currentCharacter) {
+              charInTier.remove();
+            }
+          });
           
           // Adicionar novo elemento
           const newWrapper = currentCharacter.cloneNode(true);
           setupDragEvents(newWrapper, newWrapper.querySelector('img'));
           drop.appendChild(newWrapper);
           dropped = true;
+          
+          // Se estava no pool, remover do pool
+          if (pool.contains(currentCharacter)) {
+            currentCharacter.remove();
+          }
           
           // Animação de entrada
           newWrapper.style.opacity = '0';
@@ -708,10 +857,12 @@
         drop.classList.remove('drop-target');
       });
       
-      // Remover do pool se foi movido para uma tier
-      if (dropped && pool.contains(currentCharacter)) {
-        currentCharacter.remove();
+      // Se não foi dropado em nenhuma tier e estava no pool, voltar para o pool
+      if (!dropped && pool.contains(currentCharacter)) {
+        currentCharacter.style.visibility = 'visible';
       }
+      
+      // Se estava em uma tier e não foi dropado em outra, não fazer nada (mantém na tier atual)
       
       // Limpar estado de arrasto
       cleanupDrag();
@@ -719,6 +870,14 @@
     
     // Limpar estado de arrasto
     function cleanupDrag() {
+      // Parar a verificação de rolagem
+      clearInterval(scrollInterval);
+      scrollInterval = null;
+      
+      // Esconder indicadores de rolagem
+      scrollTopIndicator.classList.remove('active');
+      scrollBottomIndicator.classList.remove('active');
+      
       // Remover todos os event listeners
       document.removeEventListener('mousemove', dragElement);
       document.removeEventListener('touchmove', dragElementTouch);
