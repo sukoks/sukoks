@@ -1,908 +1,393 @@
-<!DOCTYPE html>
-<html lang="pt">
+<!doctype html>
+<html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Tierlist Supers</title>
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <style>
-    :root {
-      --accent: #4d79ff;
-      --bg-dark: #121212;
-      --bg-darker: #0a0a0a;
-      --text: #f5f5f5;
-      --tier-100: #4CAF50;
-      --tier-75: #8BC34A;
-      --tier-50: #FFC107;
-      --tier-25: #FF9800;
-      --tier-0: #F44336;
-      --modal-bg: rgba(0, 0, 0, 0.8);
-      --modal-content: #1e1e1e;
-    }
-    * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      padding: 20px;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-      background: var(--bg-dark);
-      color: var(--text);
-      overflow-x: hidden;
-      min-height: 100vh;
-      touch-action: none;
-    }
-    .main-container {
-      max-width: 1000px;
-      margin: 0 auto;
-      height: calc(100vh - 120px);
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-    }
-    h1 {
-      text-align: center;
-      color: white;
-      margin-bottom: 20px;
-      font-size: 2rem;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 15px;
-      flex-shrink: 0;
-    }
-    .tier-list-container {
-      flex-grow: 1;
-      overflow-y: auto;
-      scroll-behavior: smooth;
-      padding-bottom: 20px;
-    }
-    .tier-container {
-      display: flex;
-      flex-direction: column;
-      gap: 15px;
-    }
-    .tier {
-      background: var(--bg-darker);
-      border-radius: 12px;
-      border-left: 6px solid;
-      padding: 15px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      transition: all 0.3s ease;
-      position: relative;
-    }
-    .tier[data-tier="100"] { border-color: var(--tier-100); }
-    .tier[data-tier="75"] { border-color: var(--tier-75); }
-    .tier[data-tier="50"] { border-color: var(--tier-50); }
-    .tier[data-tier="25"] { border-color: var(--tier-25); }
-    .tier[data-tier="0"] { border-color: var(--tier-0); }
-    .tier-label {
-      font-weight: bold;
-      font-size: 1.1rem;
-      margin-bottom: 5px;
-      display: flex;
-      align-items: center;
-      gap: 10px;
-    }
-    .tier-content {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 15px;
-      min-height: 120px;
-      background: rgba(255,255,255,0.05);
-      border-radius: 8px;
-      padding: 10px;
-      transition: all 0.3s;
-    }
-    .character-container {
-      position: relative;
-      width: 100px;
-      text-align: center;
-      pointer-events: auto;
-      user-select: none;
-      transition: transform 0.3s ease;
-    }
-    .character-container:hover {
-      transform: translateY(-5px);
-    }
-    .character {
-      width: 100px;
-      height: 100px;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 3px solid #333;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.5);
-      transition: transform 0.3s, box-shadow 0.3s;
-      cursor: grab;
-    }
-    .character:active {
-      cursor: grabbing;
-    }
-    .character.dragging {
-      transform: scale(1.2);
-      opacity: 0.8;
-      z-index: 1000;
-      position: fixed;
-      pointer-events: none;
-      box-shadow: 0 8px 16px rgba(0,0,0,0.7);
-      animation: pulse 0.8s infinite alternate;
-    }
-    @keyframes pulse {
-      from { box-shadow: 0 0 10px rgba(255, 255, 255, 0.5); }
-      to { box-shadow: 0 0 20px rgba(255, 255, 255, 0.8); }
-    }
-    .character-name {
-      font-size: 0.8rem;
-      color: white;
-      margin-top: 5px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .character-pool {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 15px;
-      padding: 15px 0;
-      min-height: 150px;
-    }
-    .delete-btn {
-      position: absolute;
-      top: -8px;
-      right: -8px;
-      background: #ff4d4d;
-      border: none;
-      border-radius: 50%;
-      width: 24px;
-      height: 24px;
-      color: white;
-      font-size: 12px;
-      cursor: pointer;
-      opacity: 0;
-      transition: opacity 0.3s, transform 0.3s;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 10;
-    }
-    .character-container:hover .delete-btn {
-      opacity: 1;
-    }
-    .delete-btn:hover {
-      transform: scale(1.2);
-      background: #ff1a1a;
-    }
-    .controls {
-      display: flex;
-      justify-content: center;
-      gap: 15px;
-      margin-bottom: 20px;
-      flex-shrink: 0;
-    }
-    .btn {
-      background: var(--accent);
-      color: white;
-      border: none;
-      padding: 10px 20px;
-      border-radius: 30px;
-      cursor: pointer;
-      font-weight: bold;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      transition: all 0.3s;
-    }
-    .btn:hover {
-      background: #3a5fcc;
-      transform: translateY(-3px);
-      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-    }
-    .btn i {
-      font-size: 1.2rem;
-    }
-    .modal {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: var(--modal-bg);
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      z-index: 10000;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.3s;
-    }
-    .modal.active {
-      opacity: 1;
-      pointer-events: all;
-    }
-    .modal-content {
-      background: var(--modal-content);
-      border-radius: 12px;
-      padding: 25px;
-      width: 90%;
-      max-width: 500px;
-      transform: translateY(20px);
-      transition: transform 0.3s;
-    }
-    .modal.active .modal-content {
-      transform: translateY(0);
-    }
-    .modal-header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 20px;
-    }
-    .modal-title {
-      font-size: 1.5rem;
-      margin: 0;
-    }
-    .close-modal {
-      background: none;
-      border: none;
-      color: var(--text);
-      font-size: 1.5rem;
-      cursor: pointer;
-    }
-    .form-group {
-      margin-bottom: 20px;
-    }
-    label {
-      display: block;
-      margin-bottom: 8px;
-      font-weight: 500;
-    }
-    input[type="text"],
-    input[type="file"] {
-      width: 100%;
-      padding: 12px;
-      border-radius: 8px;
-      border: 1px solid #333;
-      background: rgba(255,255,255,0.05);
-      color: var(--text);
-    }
-    .preview-container {
-      margin: 15px 0;
-      text-align: center;
-    }
-    #image-preview {
-      width: 120px;
-      height: 120px;
-      border-radius: 50%;
-      object-fit: cover;
-      border: 2px dashed var(--accent);
-      background: rgba(255,255,255,0.05);
-      display: none;
-    }
-    .submit-btn {
-      background: var(--tier-100);
-      color: white;
-      border: none;
-      padding: 12px 25px;
-      border-radius: 30px;
-      cursor: pointer;
-      font-weight: bold;
-      width: 100%;
-      transition: background 0.3s;
-    }
-    .submit-btn:hover {
-      background: #3d8b40;
-    }
-    .empty-message {
-      color: rgba(255,255,255,0.4);
-      font-style: italic;
-      text-align: center;
-      width: 100%;
-      padding: 20px;
-    }
-    .drop-target {
-      animation: highlight 0.5s;
-    }
-    @keyframes highlight {
-      0% { background: rgba(77, 121, 255, 0.1); }
-      100% { background: rgba(255,255,255,0.05); }
-    }
-    .scroll-indicator {
-      position: fixed;
-      width: 100%;
-      height: 60px;
-      z-index: 999;
-      pointer-events: none;
-      opacity: 0;
-      transition: opacity 0.3s;
-    }
-    .scroll-indicator.top {
-      top: 0;
-      background: linear-gradient(to bottom, rgba(0,0,0,0.7), transparent);
-    }
-    .scroll-indicator.bottom {
-      bottom: 0;
-      background: linear-gradient(to top, rgba(0,0,0,0.7), transparent);
-    }
-    .scroll-indicator.active {
-      opacity: 1;
-    }
-    @media (max-width: 768px) {
-      .character, .character-container {
-        width: 80px;
-        height: 80px;
-      }
-      .character-name {
-        font-size: 0.7rem;
-      }
-    }
-  </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+<title>TierList</title>
+
+<!-- Tailwind for quick styling (CDN) -->
+<script src="https://cdn.tailwindcss.com"></script>
+
+<!-- SortableJS for drag & drop (mouse + touch) -->
+<script src="https://cdn.jsdelivr.net/npm/sortablejs@1.15.0/Sortable.min.js"></script>
+
+<!-- html2canvas for export -->
+<script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
+  :root{
+    --bg:#0f0f0f;
+    --panel:#0e0e0e;
+    --muted:rgba(255,255,255,0.72);
+  }
+  *{box-sizing:border-box;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,"Helvetica Neue",Arial}
+  html,body,#root{height:100%}
+  body{margin:0;background:linear-gradient(180deg,#070707 0%, var(--bg) 60%);color:#fff;-webkit-font-smoothing:antialiased; -moz-osx-font-smoothing:grayscale;}
+  .container{max-width:980px;margin:18px auto;padding:12px;}
+  header{display:flex;gap:12px;align-items:center;justify-content:space-between;margin-bottom:14px}
+  h1{font-weight:700;font-size:1.35rem;background:linear-gradient(90deg,#60a5fa,#c084fc);-webkit-background-clip:text;background-clip:text;color:transparent}
+  .editable-title{background:transparent;border:0;color:transparent;padding:0;margin:0;outline:none}
+  .btn{display:inline-flex;align-items:center;gap:8px;padding:8px 12px;border-radius:10px;background:linear-gradient(90deg,#2563eb,#1e40af);box-shadow:0 6px 18px rgba(31,41,55,0.4);border:0;color:#fff;cursor:pointer}
+  .btn.secondary{background:#111827}
+  .panel{background:rgba(255,255,255,0.03);border-radius:14px;padding:14px;border:1px solid rgba(255,255,255,0.04)}
+  .tiers{display:flex;flex-direction:column;gap:12px}
+  .tier{border-radius:12px;padding:12px;border:2px solid rgba(255,255,255,0.04);display:flex;flex-direction:column;gap:8px;transition:box-shadow .18s,transform .14s}
+  .tier.dragover{box-shadow:0 10px 30px rgba(0,0,0,0.6);transform:translateY(-4px)}
+  .tier .title{display:flex;justify-content:space-between;align-items:center}
+  .cells{min-height:120px;display:flex;flex-wrap:wrap;gap:12px;align-items:flex-start;padding:6px}
+  .card{width:120px;height:170px;border-radius:12px;overflow:hidden;background:#222;flex:0 0 auto;box-shadow:0 8px 22px rgba(0,0,0,0.6);position:relative;cursor:grab;transition:transform .12s,box-shadow .12s}
+  .card:active{cursor:grabbing}
+  .card img{width:100%;height:100%;object-fit:cover;display:block}
+  .card .label{position:absolute;left:0;right:0;bottom:0;background:linear-gradient(180deg,transparent,rgba(0,0,0,0.75));color:#fff;font-size:13px;padding:8px;text-align:center;opacity:1}
+  .counter{position:absolute;top:8px;right:8px;background:rgba(0,0,0,0.6);padding:6px;border-radius:999px;border:1px solid rgba(255,255,255,0.06);font-size:12px}
+  .pool-wrap{margin-top:12px}
+  .pool-scroll{display:flex;gap:12px;overflow-x:auto;padding:10px 6px;scroll-snap-type:x mandatory}
+  .card{scroll-snap-align:center}
+  .help{color:var(--muted);font-size:13px}
+  footer{margin-top:12px;color:var(--muted);font-size:13px;text-align:center}
+
+  /* tier colors */
+  .t1{border-color:#22c55e;background:linear-gradient(180deg,rgba(34,197,94,0.05),transparent)}
+  .t2{border-color:#84cc16;background:linear-gradient(180deg,rgba(132,204,22,0.04),transparent)}
+  .t3{border-color:#f59e0b;background:linear-gradient(180deg,rgba(245,158,11,0.04),transparent)}
+  .t4{border-color:#fb923c;background:linear-gradient(180deg,rgba(251,146,60,0.04),transparent)}
+  .t5{border-color:#ef4444;background:linear-gradient(180deg,rgba(239,68,68,0.04),transparent)}
+
+  /* responsive */
+  @media (max-width:640px){
+    .card{width:140px;height:200px}
+    .pool-scroll{padding-bottom:18px}
+  }
+
+  /* subtle animations */
+  @keyframes popIn { from {opacity:0; transform:scale(.96) translateY(6px)} to {opacity:1; transform:none} }
+  .card { animation: popIn .22s ease both }
+  input[type="file"]{display:none}
+  .hidden{display:none}
+  .max-reached{opacity:0.7;pointer-events:none}
+</style>
 </head>
 <body>
-  <div class="scroll-indicator top"></div>
-  <div class="scroll-indicator bottom"></div>
-
-  <div class="main-container">
-    <h1><i class="fas fa-layer-group"></i> Tierlist Supers</h1>
-    
-    <div class="controls">
-      <button class="btn" id="add-character-btn">
-        <i class="fas fa-plus-circle"></i> Adicionar Personagem
-      </button>
-      <button class="btn" id="reset-btn">
-        <i class="fas fa-redo-alt"></i> Resetar Tierlist
-      </button>
-    </div>
-    
-    <div class="tier-list-container">
-      <div class="tier-container">
-        <div class="tier" data-tier="100">
-          <div class="tier-label">
-            <span>100% TOP TIER</span>
-            <i class="fas fa-crown" style="color: var(--tier-100);"></i>
-          </div>
-          <div class="tier-content" data-drop="100"></div>
-        </div>
-        <div class="tier" data-tier="75">
-          <div class="tier-label">
-            <span>75% EXCELENTE</span>
-            <i class="fas fa-star" style="color: var(--tier-75);"></i>
-          </div>
-          <div class="tier-content" data-drop="75"></div>
-        </div>
-        <div class="tier" data-tier="50">
-          <div class="tier-label">
-            <span>50% MÉDIO</span>
-            <i class="fas fa-exchange-alt" style="color: var(--tier-50);"></i>
-          </div>
-          <div class="tier-content" data-drop="50"></div>
-        </div>
-        <div class="tier" data-tier="25">
-          <div class="tier-label">
-            <span>25% FRACO</span>
-            <i class="fas fa-exclamation-triangle" style="color: var(--tier-25);"></i>
-          </div>
-          <div class="tier-content" data-drop="25"></div>
-        </div>
-        <div class="tier" data-tier="0">
-          <div class="tier-label">
-            <span>0% LIXO</span>
-            <i class="fas fa-skull" style="color: var(--tier-0);"></i>
-          </div>
-          <div class="tier-content" data-drop="0"></div>
-        </div>
+<div id="root" class="container">
+  <header>
+    <div style="display:flex;flex-direction:column;gap:8px;">
+      <div style="display:flex;align-items:center;gap:12px;">
+        <h1 id="titleDisplay">TierList</h1>
+        <input id="titleInput" class="editable-title" aria-label="Editar título" value="TierList" />
+        <button id="editTitleBtn" class="btn secondary" title="Editar título">Editar</button>
       </div>
-      
-      <div class="character-pool" id="character-pool">
-        <!-- Personagens serão adicionados aqui via JavaScript -->
-      </div>
+      <div class="help" id="subtitle">Clique em editar para personalizar o título.</div>
     </div>
-  </div>
-  
-  <!-- Modal para adicionar personagem -->
-  <div class="modal" id="add-character-modal">
-    <div class="modal-content">
-      <div class="modal-header">
-        <h3 class="modal-title">Adicionar Novo Personagem</h3>
-        <button class="close-modal" id="close-modal">&times;</button>
-      </div>
-      <form id="character-form">
-        <div class="form-group">
-          <label for="character-name">Nome do Personagem</label>
-          <input type="text" id="character-name" placeholder="Ex: Homem-Aranha" required>
-        </div>
-        <div class="form-group">
-          <label for="character-img">Foto do Personagem</label>
-          <input type="file" id="character-img" accept="image/*" required>
-        </div>
-        <div class="preview-container">
-          <img id="image-preview" alt="Pré-visualização da imagem">
-        </div>
-        <button type="submit" class="submit-btn">Adicionar Personagem</button>
-      </form>
+
+    <div style="display:flex;gap:8px;align-items:center;">
+      <label for="fileInput" id="addBtn" class="btn" title="Adicionar anime">Adicionar</label>
+      <input id="fileInput" type="file" accept="image/*" />
+      <button id="downloadBtn" class="btn" title="Baixar imagem da tier list">Baixar Tier List</button>
+      <button id="resetBtn" class="btn secondary" title="Resetar">Resetar</button>
     </div>
-  </div>
-  
-  <script>
-    // Dados iniciais dos personagens (apenas com fotos válidas)
-    const characters = [
-      { name: "Stormicide", img: "https://files.fm/thumb_show.php?i=zwngz3ft4b" },
-      { name: "Homem-Trovão", img: "https://files.fm/thumb_show.php?i=abfphs3p5z" },
-      { name: "Homem-Universal", img: "https://files.fm/thumb_show.php?i=dqpwkzcfqj" },
-      { name: "Hiper-Choque", img: "https://files.fm/thumb_show.php?i=dqvaxa497d" },
-      { name: "Stratogata", img: "https://files.fm/thumb_show.php?i=65x4cg5n3g" },
-      { name: "Everseer", img: "https://files.fm/thumb_show.php?i=3xvfmster6" },
-      { name: "Downburst", img: "https://files.fm/thumb_show.php?i=5hwsb3s6gc" },
-      { name: "Macroburst", img: "https://files.fm/thumb_show.php?i=kt4tev82ye" },
-      { name: "Phylange", img: "https://files.fm/thumb_show.php?i=jgyzr35gcy" },
-      { name: "Blazestone", img: "https://files.fm/thumb_show.php?i=q5k6j3z97y" },
-      { name: "Apogee", img: "https://files.fm/thumb_show.php?i=gvff2n7zhy" },
-      { name: "Raio de plasma", img: "https://files.fm/thumb_show.php?i=gekhuaawdt" },
-      { name: "Gamma Jack", img: "https://files.fm/thumb_show.php?i=cx98qnume2" },
-      { name: "Slashdown", img: "https://files.fm/thumb_show.php?i=qu2du34c54" },
-      { name: "Dinamite", img: "https://files.fm/thumb_show.php?i=pz9nuj69as" },
-      { name: "Metaman", img: "https://files.fm/thumb_show.php?i=fvyhnyb5pk" },
-      { name: "Sindrome", img: "https://files.fm/thumb_show.php?i=6m3hrx9jvc" },
-      { name: "Elastic Girl", img: "https://files.fm/thumb_show.php?i=rtr7t5qy8f" },
-      { name: "Dash", img: "https://files.fm/thumb_show.php?i=6sejc23vrh" },
-      { name: "Gelado", img: "https://files.fm/thumb_show.php?i=6egfn2qkf4" },
-      { name: "Escavador", img: "https://files.fm/thumb_show.php?i=fjkceza7pw" },
-      { name: "Violeta", img: "https://files.fm/thumb_show.php?i=v5wf5zfq6g" },
-      { name: "Void", img: "https://files.fm/thumb_show.php?i=m7p5rfuyp4" },
-      { name: "Gazer Beam", img: "https://files.fm/thumb_show.php?i=86myz6uxsd" }
-    ];
+  </header>
 
-    // Elementos DOM
-    const pool = document.getElementById('character-pool');
-    const modal = document.getElementById('add-character-modal');
-    const closeModalBtn = document.getElementById('close-modal');
-    const addCharacterBtn = document.getElementById('add-character-btn');
-    const characterForm = document.getElementById('character-form');
-    const characterImgInput = document.getElementById('character-img');
-    const imagePreview = document.getElementById('image-preview');
-    const resetBtn = document.getElementById('reset-btn');
-    const scrollTopIndicator = document.querySelector('.scroll-indicator.top');
-    const scrollBottomIndicator = document.querySelector('.scroll-indicator.bottom');
-    const tierListContainer = document.querySelector('.tier-list-container');
+  <main class="panel" id="captureArea">
+    <div class="tiers" id="tiersWrap">
+      <!-- tiers injected -->
+    </div>
 
-    // Estado da aplicação
-    let dragged = null;
-    let currentCharacter = null;
-    let customCharacters = JSON.parse(localStorage.getItem('customCharacters')) || [];
-    let isDragging = false;
-    let scrollInterval = null;
-    let lastScrollTime = 0;
-    const scrollSpeed = 20;
-    const scrollZoneHeight = 100;
-    const characterRegistry = new Set(); // Para controlar personagens únicos
+    <section class="pool-wrap">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px">
+        <strong>@toucabr</strong>
+        <span class="help" id="poolHelp">Arraste as cartas para as tiers — máximo 30.</span>
+      </div>
+      <div class="pool-scroll" id="pool" tabindex="0" aria-label="@toucabr (scroll horizontal)"></div>
+    </section>
 
-    // Inicializar a tierlist
-    function initTierlist() {
-      renderCharacters();
-      
-      // Event listeners para modais
-      addCharacterBtn.addEventListener('click', () => {
-        modal.classList.add('active');
-      });
-      
-      closeModalBtn.addEventListener('click', () => {
-        modal.classList.remove('active');
-        characterForm.reset();
-        imagePreview.style.display = 'none';
-      });
-      
-      // Preview da imagem
-      characterImgInput.addEventListener('change', function(e) {
-        if (this.files && this.files[0]) {
-          const reader = new FileReader();
-          
-          reader.onload = function(e) {
-            imagePreview.src = e.target.result;
-            imagePreview.style.display = 'block';
-          }
-          
-          reader.readAsDataURL(this.files[0]);
-        }
-      });
-      
-      // Adicionar novo personagem
-      characterForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        
-        const name = document.getElementById('character-name').value.trim();
-        const file = characterImgInput.files[0];
-        
-        if (!name || !file) return;
-        
-        // Verificar se personagem já existe
-        if (characterRegistry.has(name.toLowerCase())) {
-          alert(`Personagem "${name}" já existe!`);
-          return;
-        }
-        
-        const reader = new FileReader();
-        reader.onload = function(e) {
-          const newCharacter = {
-            name: name,
-            img: e.target.result,
-            custom: true
-          };
-          
-          customCharacters.push(newCharacter);
-          localStorage.setItem('customCharacters', JSON.stringify(customCharacters));
-          characterRegistry.add(name.toLowerCase());
-          
-          createCharacterElement(newCharacter, true);
-          
-          modal.classList.remove('active');
-          characterForm.reset();
-          imagePreview.style.display = 'none';
-        };
-        
-        reader.readAsDataURL(file);
-      });
-      
-      // Resetar tierlist
-      resetBtn.addEventListener('click', function() {
-        if (confirm('Tem certeza que deseja resetar a tierlist? Todos os personagens voltarão para o pool.')) {
-          document.querySelectorAll('.tier-content').forEach(tier => {
-            tier.innerHTML = '';
-          });
-          
-          renderCharacters();
-        }
-      });
+    <footer id="footerNote">(as imagens ficam apenas no seu navegador; não enviamos nada)</footer>
+  </main>
+</div>
+
+<script>
+// Config
+const MAX_CARDS = 30;
+const STORAGE_KEY = 'anime_tierlist_custom_v2';
+
+// Tiers definition
+const TIERS = [
+  {id:'t1',title:'100% TOP TIER', cls:'t1'},
+  {id:'t2',title:'75% EXCELENTE', cls:'t2'},
+  {id:'t3',title:'50% MÉDIO', cls:'t3'},
+  {id:'t4',title:'25% FRACO', cls:'t4'},
+  {id:'t5',title:'0% LIXO', cls:'t5'}
+];
+
+// Elements
+const tiersWrap = document.getElementById('tiersWrap');
+const poolEl = document.getElementById('pool');
+const fileInput = document.getElementById('fileInput');
+const addBtn = document.getElementById('addBtn');
+const downloadBtn = document.getElementById('downloadBtn');
+const resetBtn = document.getElementById('resetBtn');
+const titleInput = document.getElementById('titleInput');
+const editTitleBtn = document.getElementById('editTitleBtn');
+const titleDisplay = document.getElementById('titleDisplay');
+const subtitle = document.getElementById('subtitle');
+
+// Utilities
+function createEl(tag, attrs={}, children=[]){
+  const el = document.createElement(tag);
+  for(const k in attrs){
+    if(k==='class') el.className = attrs[k];
+    else if(k==='html') el.innerHTML = attrs[k];
+    else el.setAttribute(k, attrs[k]);
+  }
+  (Array.isArray(children)?children:[children]).forEach(ch=> { if(!ch) return; el.appendChild(typeof ch === 'string' ? document.createTextNode(ch) : ch); });
+  return el;
+}
+
+function readFileAsDataURL(file){
+  return new Promise((res, rej)=>{
+    const fr = new FileReader();
+    fr.onload = ()=> res(fr.result);
+    fr.onerror = rej;
+    fr.readAsDataURL(file);
+  });
+}
+
+// Card factory
+function makeCard(id, name, dataUrl, idx){
+  const card = createEl('div',{class:'card', 'data-id':id, title:name});
+  const img = createEl('img',{src:dataUrl, alt:name, draggable:'false'});
+  img.onerror = ()=> { img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" width="300" height="400"><rect width="100%" height="100%" fill="#3d3d3d"/><text x="50%" y="50%" fill="#fff" font-size="20" text-anchor="middle" alignment-baseline="middle">Imagem inválida</text></svg>'); };
+  const label = createEl('div',{class:'label'}, name);
+  const counter = createEl('div',{class:'counter'}, String(idx+1));
+  card.appendChild(img); card.appendChild(label); card.appendChild(counter);
+  return card;
+}
+
+// State management
+function loadState(){
+  try{
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if(raw) return JSON.parse(raw);
+  }catch(e){ console.warn(e) }
+  const init = { pool: [], t1:[], t2:[], t3:[], t4:[], t5:[], title: 'TierList' };
+  return init;
+}
+
+function saveState(state){
+  try{ localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch(e){ console.warn(e) }
+}
+
+// Render tiers and pool
+function render(){
+  tiersWrap.innerHTML = '';
+  const state = loadState();
+  // Title
+  titleDisplay.textContent = state.title || 'TierList';
+  titleInput.value = state.title || 'TierList';
+
+  // build tiers
+  TIERS.forEach(t=>{
+    const box = createEl('div',{class:`tier ${t.cls}`,'data-tier':t.id});
+    const titleRow = createEl('div',{class:'title'});
+    const strong = createEl('strong',{}, t.title);
+    const hint = createEl('span',{class:'help'}, 'Arraste aqui');
+    titleRow.appendChild(strong); titleRow.appendChild(hint);
+    const cells = createEl('div',{class:'cells', id:`cells-${t.id}`});
+    // populate from state
+    (state[t.id]||[]).forEach((c, idx)=>{
+      const card = makeCard(c.id, c.name, c.dataUrl, idx);
+      cells.appendChild(card);
+    });
+    box.appendChild(titleRow);
+    box.appendChild(cells);
+    tiersWrap.appendChild(box);
+  });
+
+  // pool
+  poolEl.innerHTML = '';
+  (state.pool||[]).forEach((c, idx)=>{
+    const card = makeCard(c.id, c.name, c.dataUrl, idx);
+    poolEl.appendChild(card);
+  });
+
+  // Update add button disable
+  const total = getTotalCards();
+  if(total >= MAX_CARDS){
+    addBtn.classList.add('max-reached');
+    subtitle.textContent = `Máximo de ${MAX_CARDS} cartas alcançado.`;
+  } else {
+    addBtn.classList.remove('max-reached');
+    subtitle.textContent = `Clique em editar para personalizar o título.`;
+  }
+
+  attachSortables();
+}
+
+function getTotalCards(){
+  const state = loadState();
+  let total = (state.pool||[]).length;
+  TIERS.forEach(t => total += (state[t.id]||[]).length);
+  return total;
+}
+
+// Attach Sortable
+let instances = [];
+function attachSortables(){
+  instances.forEach(i=>i.destroy && i.destroy());
+  instances = [];
+  const options = {
+    group: 'shared',
+    animation: 180,
+    swapThreshold: 0.65,
+    onAdd: () => { setTimeout(persistFromDOM, 60); },
+    onUpdate: () => { setTimeout(persistFromDOM, 60); },
+    onRemove: () => { setTimeout(persistFromDOM, 60); },
+    onEnd: (evt) => {
+      const parent = evt.to.closest('.tier');
+      if(parent){ parent.classList.add('dragover'); setTimeout(()=>parent.classList.remove('dragover'),400); }
     }
-    
-    // Renderizar todos os personagens
-    function renderCharacters() {
-      pool.innerHTML = '';
-      characterRegistry.clear();
-      
-      // Adicionar personagens padrão (apenas se não estiverem em nenhuma tier)
-      characters.forEach(c => {
-        if (!characterRegistry.has(c.name.toLowerCase())) {
-          // Verificar se o personagem já está em alguma tier
-          let isInTier = false;
-          document.querySelectorAll('.tier-content').forEach(tier => {
-            if (tier.querySelector(`.character-container[data-name="${c.name}"]`)) {
-              isInTier = true;
-            }
-          });
-          
-          if (!isInTier) {
-            createCharacterElement(c);
-            characterRegistry.add(c.name.toLowerCase());
-          }
-        }
-      });
-      
-      // Adicionar personagens customizados (apenas se não estiverem em nenhuma tier)
-      customCharacters.forEach(c => {
-        if (!characterRegistry.has(c.name.toLowerCase())) {
-          // Verificar se o personagem já está em alguma tier
-          let isInTier = false;
-          document.querySelectorAll('.tier-content').forEach(tier => {
-            if (tier.querySelector(`.character-container[data-name="${c.name}"]`)) {
-              isInTier = true;
-            }
-          });
-          
-          if (!isInTier) {
-            createCharacterElement(c, true);
-            characterRegistry.add(c.name.toLowerCase());
-          }
-        }
-      });
-      
-      // Adicionar mensagem se não houver personagens
-      if (pool.children.length === 0) {
-        pool.innerHTML = '<div class="empty-message">Adicione personagens usando o botão acima</div>';
-      }
-    }
-    
-    // Criar elemento de personagem
-    function createCharacterElement(character, isCustom = false) {
-      const wrapper = document.createElement('div');
-      wrapper.className = 'character-container';
-      wrapper.dataset.name = character.name;
-      
-      const img = document.createElement('img');
-      img.src = character.img;
-      img.className = 'character';
-      img.alt = character.name;
-      img.draggable = false;
-      
-      const label = document.createElement('div');
-      label.className = 'character-name';
-      label.textContent = character.name;
-      
-      // Botão de deletar para personagens customizados
-      if (isCustom) {
-        const deleteBtn = document.createElement('button');
-        deleteBtn.className = 'delete-btn';
-        deleteBtn.innerHTML = '<i class="fas fa-trash"></i>';
-        deleteBtn.title = 'Remover personagem';
-        
-        deleteBtn.addEventListener('click', function(e) {
-          e.stopPropagation();
-          if (confirm(`Remover ${character.name} permanentemente?`)) {
-            // Remover do array de customCharacters
-            customCharacters = customCharacters.filter(c => c.img !== character.img);
-            localStorage.setItem('customCharacters', JSON.stringify(customCharacters));
-            characterRegistry.delete(character.name.toLowerCase());
-            
-            // Remover do DOM
-            wrapper.remove();
-            
-            // Remover de qualquer tier
-            document.querySelectorAll('.tier-content').forEach(tier => {
-              const charInTier = tier.querySelector(`.character-container[data-name="${character.name}"]`);
-              if (charInTier) charInTier.remove();
-            });
-          }
-        });
-        
-        wrapper.appendChild(deleteBtn);
-      }
-      
-      // Adicionar funcionalidade de arrastar
-      setupDragEvents(wrapper, img);
-      
-      wrapper.appendChild(img);
-      wrapper.appendChild(label);
-      pool.appendChild(wrapper);
-    }
-    
-    // Configurar eventos de arrastar (mouse e touch)
-    function setupDragEvents(wrapper, img) {
-      // Eventos de mouse
-      img.addEventListener('mousedown', startDrag);
-      wrapper.addEventListener('mousedown', startDrag);
-      
-      // Eventos de touch
-      img.addEventListener('touchstart', startDragTouch, { passive: false });
-      wrapper.addEventListener('touchstart', startDragTouch, { passive: false });
-    }
-    
-    // Iniciar arrasto com mouse
-    function startDrag(e) {
-      if (e.button !== 0 || isDragging) return;
+  };
+  // pool horizontal scroll container children sortable (only items)
+  instances.push(Sortable.create(poolEl, {...options, direction: 'horizontal'}));
+  // tiers
+  TIERS.forEach(t=>{
+    const el = document.getElementById(`cells-${t.id}`);
+    instances.push(Sortable.create(el, {...options}));
+  });
+}
+
+// Persist by reading DOM
+function persistFromDOM(){
+  const state = { pool: [], title: titleInput.value || 'TierList' };
+  // pool
+  state.pool = Array.from(poolEl.children).map(ch => ({
+    id: ch.getAttribute('data-id'),
+    name: ch.getAttribute('title'),
+    dataUrl: ch.querySelector('img').src
+  }));
+  TIERS.forEach(t=>{
+    const el = document.getElementById(`cells-${t.id}`);
+    state[t.id] = Array.from(el.children).map(ch => ({
+      id: ch.getAttribute('data-id'),
+      name: ch.getAttribute('title'),
+      dataUrl: ch.querySelector('img').src
+    }));
+  });
+  saveState(state);
+  renderCounters();
+}
+
+// Render counters (position numbers)
+function renderCounters(){
+  // pool
+  Array.from(poolEl.children).forEach((ch, idx)=> {
+    const cnt = ch.querySelector('.counter');
+    if(cnt) cnt.textContent = String(idx+1);
+  });
+  // tiers
+  TIERS.forEach(t=>{
+    const el = document.getElementById(`cells-${t.id}`);
+    if(!el) return;
+    Array.from(el.children).forEach((ch, idx)=>{
+      const cnt = ch.querySelector('.counter');
+      if(cnt) cnt.textContent = String(idx+1);
+    });
+  });
+}
+
+// Add new card flow
+fileInput.addEventListener('change', async (e)=>{
+  const file = e.target.files && e.target.files[0];
+  if(!file) return;
+  const total = getTotalCards();
+  if(total >= MAX_CARDS){
+    alert(`Máximo de ${MAX_CARDS} cartas atingido.`);
+    fileInput.value = '';
+    return;
+  }
+  const name = prompt('Nome do anime (deixe em branco para usar o nome do arquivo):', file.name.replace(/\.[^/.]+$/, ''));
+  const dataUrl = await readFileAsDataURL(file);
+  const state = loadState();
+  const id = 'c' + Date.now();
+  state.pool = state.pool || [];
+  state.pool.unshift({ id, name: name || file.name, dataUrl });
+  saveState(state);
+  fileInput.value = '';
+  render();
+});
+
+// Title edit
+editTitleBtn.addEventListener('click', ()=>{
+  const current = titleInput.value || 'TierList';
+  const newTitle = prompt('Digite o título da sua TierList:', current);
+  if(newTitle !== null){
+    titleInput.value = newTitle.trim() || 'TierList';
+    persistFromDOM();
+  }
+});
+
+// Download capture
+downloadBtn.addEventListener('click', async ()=>{
+  downloadBtn.disabled = true;
+  const prevText = downloadBtn.textContent;
+  downloadBtn.textContent = 'Gerando...';
+  try{
+    const area = document.getElementById('captureArea');
+    // ensure area has explicit background to avoid white capture
+    const prevBg = area.style.backgroundColor;
+    area.style.backgroundColor = getComputedStyle(document.body).backgroundColor || '#0f0f0f';
+    const canvas = await html2canvas(area, { scale: 2, useCORS: true, backgroundColor: getComputedStyle(area).backgroundColor || '#0f0f0f' });
+    const url = canvas.toDataURL('image/png');
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = (titleInput.value || 'TierList').replace(/\s+/g,'-').toLowerCase() + '.png';
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    area.style.backgroundColor = prevBg;
+  }catch(e){
+    console.error(e);
+    alert('Erro ao gerar imagem. Tente novamente.');
+  }
+  downloadBtn.disabled = false;
+  downloadBtn.textContent = prevText;
+});
+
+// Reset
+resetBtn.addEventListener('click', ()=>{
+  if(!confirm('Resetar tudo? Isso removerá todas as cartas criadas localmente.')) return;
+  localStorage.removeItem(STORAGE_KEY);
+  render();
+});
+
+// Helpers
+function readFileAsDataURL(file){
+  return new Promise((res, rej)=>{
+    const fr = new FileReader();
+    fr.onload = ()=> res(fr.result);
+    fr.onerror = rej;
+    fr.readAsDataURL(file);
+  });
+}
+
+// initial render
+(function init(){
+  // ensure state exists
+  const s = loadState();
+  if(!s.pool) s.pool = [];
+  if(!s.t1) s.t1 = [];
+  if(!s.title) s.title = 'TierList';
+  saveState(s);
+  render();
+  // keyboard hint for pool scroll
+  poolEl.addEventListener('wheel', (e)=>{
+    if(Math.abs(e.deltaX) < Math.abs(e.deltaY)){
+      // translate vertical wheel to horizontal scroll for convenience
+      poolEl.scrollLeft += e.deltaY;
       e.preventDefault();
-      
-      currentCharacter = this.closest('.character-container');
-      if (!currentCharacter) return;
-      
-      isDragging = true;
-      createDragElement(currentCharacter.cloneNode(true), e.clientX, e.clientY);
-      
-      // Esconder o personagem original enquanto estiver sendo arrastado
-      currentCharacter.style.visibility = 'hidden';
-      
-      document.addEventListener('mousemove', dragElement);
-      document.addEventListener('mouseup', endDrag);
-      document.addEventListener('mouseleave', endDrag);
-      
-      // Iniciar verificação de rolagem
-      startScrollCheck();
     }
-    
-    // Iniciar arrasto com touch
-    function startDragTouch(e) {
-      if (isDragging) return;
-      e.preventDefault();
-      
-      currentCharacter = this.closest('.character-container');
-      if (!currentCharacter) return;
-      
-      const touch = e.touches[0];
-      isDragging = true;
-      createDragElement(currentCharacter.cloneNode(true), touch.clientX, touch.clientY);
-      
-      // Esconder o personagem original enquanto estiver sendo arrastado
-      currentCharacter.style.visibility = 'hidden';
-      
-      document.addEventListener('touchmove', dragElementTouch, { passive: false });
-      document.addEventListener('touchend', endDrag);
-      
-      // Iniciar verificação de rolagem
-      startScrollCheck();
-    }
-    
-    // Criar elemento de arrasto
-    function createDragElement(clone, x, y) {
-      dragged = clone;
-      dragged.style.position = 'fixed';
-      dragged.style.left = (x - 50) + 'px';
-      dragged.style.top = (y - 50) + 'px';
-      dragged.style.zIndex = '9999';
-      dragged.style.pointerEvents = 'none';
-      dragged.querySelector('img').classList.add('dragging');
-      
-      document.body.appendChild(dragged);
-    }
-    
-    // Arrastar elemento com mouse
-    function dragElement(e) {
-      if (!dragged) return;
-      
-      dragged.style.left = (e.clientX - 50) + 'px';
-      dragged.style.top = (e.clientY - 50) + 'px';
-      
-      highlightDropTargets(e.clientX, e.clientY);
-      checkScroll(e.clientY);
-    }
-    
-    // Arrastar elemento com touch
-    function dragElementTouch(e) {
-      if (!dragged) return;
-      const touch = e.touches[0];
-      
-      dragged.style.left = (touch.clientX - 50) + 'px';
-      dragged.style.top = (touch.clientY - 50) + 'px';
-      
-      highlightDropTargets(touch.clientX, touch.clientY);
-      checkScroll(touch.clientY);
-    }
-    
-    // Destacar áreas de drop possíveis
-    function highlightDropTargets(x, y) {
-      document.querySelectorAll('[data-drop]').forEach(drop => {
-        const rect = drop.getBoundingClientRect();
-        if (x >= rect.left && x <= rect.right && y >= rect.top && y <= rect.bottom) {
-          drop.classList.add('drop-target');
-        } else {
-          drop.classList.remove('drop-target');
-        }
-      });
-    }
-    
-    // Iniciar verificação de rolagem automática
-    function startScrollCheck() {
-      scrollInterval = setInterval(() => {
-        const now = Date.now();
-        if (now - lastScrollTime > 100) {
-          lastScrollTime = now;
-          if (dragged) {
-            const rect = dragged.getBoundingClientRect();
-            checkScroll(rect.top + rect.height / 2);
-          }
-        }
-      }, 16);
-    }
-    
-    // Verificar se precisa rolar a página
-    function checkScroll(y) {
-      const containerRect = tierListContainer.getBoundingClientRect();
-      const containerTop = containerRect.top;
-      const containerBottom = containerRect.bottom;
-      const scrollTop = tierListContainer.scrollTop;
-      const scrollHeight = tierListContainer.scrollHeight;
-      const clientHeight = tierListContainer.clientHeight;
-      
-      // Mostrar indicadores de rolagem
-      scrollTopIndicator.classList.toggle('active', y < containerTop + scrollZoneHeight);
-      scrollBottomIndicator.classList.toggle('active', y > containerBottom - scrollZoneHeight);
-      
-      // Rolar para cima
-      if (y < containerTop + scrollZoneHeight && scrollTop > 0) {
-        tierListContainer.scrollBy(0, -scrollSpeed);
-      } 
-      // Rolar para baixo
-      else if (y > containerBottom - scrollZoneHeight && scrollTop < scrollHeight - clientHeight) {
-        tierListContainer.scrollBy(0, scrollSpeed);
-      }
-    }
-    
-    // Finalizar o arrasto
-    function endDrag(e) {
-      if (!dragged || !isDragging) return;
-      
-      // Mostrar o personagem original novamente
-      if (currentCharacter) {
-        currentCharacter.style.visibility = 'visible';
-      }
-      
-      let clientX, clientY;
-      
-      if (e.type === 'touchend') {
-        if (e.changedTouches && e.changedTouches[0]) {
-          clientX = e.changedTouches[0].clientX;
-          clientY = e.changedTouches[0].clientY;
-        }
-      } else {
-        clientX = e.clientX;
-        clientY = e.clientY;
-      }
-      
-      // Verificar se soltou em uma área de drop válida
-      let dropped = false;
-      document.querySelectorAll('[data-drop]').forEach(drop => {
-        const rect = drop.getBoundingClientRect();
-        if (clientX >= rect.left && clientX <= rect.right && 
-            clientY >= rect.top && clientY <= rect.bottom) {
-          
-          // Verificar se já existe na tier de destino
-          const existing = drop.querySelector(`.character-container[data-name="${currentCharacter.dataset.name}"]`);
-          if (existing) return;
-          
-          // Remover de qualquer outra tier
-          document.querySelectorAll('.tier-content').forEach(tier => {
-            const charInTier = tier.querySelector(`.character-container[data-name="${currentCharacter.dataset.name}"]`);
-            if (charInTier && charInTier !== currentCharacter) {
-              charInTier.remove();
-            }
-          });
-          
-          // Adicionar novo elemento
-          const newWrapper = currentCharacter.cloneNode(true);
-          setupDragEvents(newWrapper, newWrapper.querySelector('img'));
-          drop.appendChild(newWrapper);
-          dropped = true;
-          
-          // Se estava no pool, remover do pool
-          if (pool.contains(currentCharacter)) {
-            currentCharacter.remove();
-          }
-          
-          // Animação de entrada
-          newWrapper.style.opacity = '0';
-          newWrapper.style.transform = 'scale(0.8)';
-          setTimeout(() => {
-            newWrapper.style.transition = 'opacity 0.3s, transform 0.3s';
-            newWrapper.style.opacity = '1';
-            newWrapper.style.transform = 'scale(1)';
-          }, 10);
-        }
-        
-        drop.classList.remove('drop-target');
-      });
-      
-      // Se não foi dropado em nenhuma tier e estava no pool, voltar para o pool
-      if (!dropped && pool.contains(currentCharacter)) {
-        currentCharacter.style.visibility = 'visible';
-      }
-      
-      // Se estava em uma tier e não foi dropado em outra, não fazer nada (mantém na tier atual)
-      
-      // Limpar estado de arrasto
-      cleanupDrag();
-    }
-    
-    // Limpar estado de arrasto
-    function cleanupDrag() {
-      // Parar a verificação de rolagem
-      clearInterval(scrollInterval);
-      scrollInterval = null;
-      
-      // Esconder indicadores de rolagem
-      scrollTopIndicator.classList.remove('active');
-      scrollBottomIndicator.classList.remove('active');
-      
-      // Remover todos os event listeners
-      document.removeEventListener('mousemove', dragElement);
-      document.removeEventListener('touchmove', dragElementTouch);
-      document.removeEventListener('mouseup', endDrag);
-      document.removeEventListener('touchend', endDrag);
-      document.removeEventListener('mouseleave', endDrag);
-      
-      // Remover elemento arrastado
-      if (dragged) {
-        dragged.remove();
-        dragged = null;
-      }
-      
-      // Resetar estado
-      currentCharacter = null;
-      isDragging = false;
-      
-      // Remover highlights
-      document.querySelectorAll('.drop-target').forEach(el => {
-        el.classList.remove('drop-target');
-      });
-    }
-    
-    // Iniciar a aplicação
-    initTierlist();
-  </script>
+  }, { passive: false });
+})();
+</script>
 </body>
 </html>
